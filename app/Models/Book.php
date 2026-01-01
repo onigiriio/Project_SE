@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Borrow;
 
 class Book extends Model
 {
@@ -47,6 +48,14 @@ class Book extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get borrows for the book.
+     */
+    public function borrows(): HasMany
+    {
+        return $this->hasMany(Borrow::class);
     }
 
     /**

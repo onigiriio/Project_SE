@@ -40,10 +40,47 @@ class BookController extends Controller
             ->latest()
             ->paginate(5);
 
+        $borrowed = false;
+        if (auth()->check()) {
+            $borrowed = $book->borrows()
+                ->where('user_id', auth()->id())
+                ->whereNull('returned_at')
+                ->exists();
+        }
+
         return view('books.show', [
             'book' => $book,
             'reviews' => $reviews,
+            'borrowed' => $borrowed,
         ]);
+    }
+
+    /**
+     * Borrow a book for the authenticated user.
+     */
+    public function borrow(Book $book)
+    {
+        if (! auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $existing = $book->borrows()
+            ->where('user_id', auth()->id())
+            ->whereNull('returned_at')
+            ->first();
+
+        if ($existing) {
+            return redirect()->back()->with('success', 'You have already borrowed this book.');
+        }
+
+        \App\Models\Borrow::create([
+            'user_id' => auth()->id(),
+            'book_id' => $book->id,
+            'borrowed_at' => now(),
+            'status' => 'borrowed',
+        ]);
+
+        return redirect()->back()->with('success', 'Book borrowed successfully!');
     }
 
     /**

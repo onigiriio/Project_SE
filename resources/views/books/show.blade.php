@@ -93,6 +93,22 @@
                     <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 mb-8">
                         <p class="text-gray-600 text-sm mb-2">Price</p>
                         <p class="text-4xl font-bold text-green-600">RM {{ number_format($book->price, 2) }}</p>
+                        @auth
+                            <div class="mt-4">
+                                @if(isset($borrowed) && $borrowed)
+                                    <button disabled class="px-4 py-2 bg-gray-400 text-white rounded-md font-semibold">Already Borrowed</button>
+                                @else
+                                    <form action="{{ route('books.borrow', $book) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold">Borrow Book</button>
+                                    </form>
+                                @endif
+                            </div>
+                        @else
+                            <div class="mt-4">
+                                <a href="{{ route('login') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold">Log in to Borrow</a>
+                            </div>
+                        @endauth
                     </div>
 
                     <!-- Description -->

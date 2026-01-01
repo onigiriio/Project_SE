@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
     Route::get('/genres/{genre}', [BookController::class, 'byGenre'])->name('books.by-genre');
     Route::post('/books/{book}/reviews', [BookController::class, 'storeReview'])->name('books.store-review');
+    Route::post('/books/{book}/borrow', [BookController::class, 'borrow'])->name('books.borrow');
 
     Route::get('/books', function () {
         return view('books');
