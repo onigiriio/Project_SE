@@ -127,71 +127,48 @@
             </div>
         </section>
 
-        <!-- Books by Genre Section -->
-        @forelse($genres as $genre)
-            <section class="mb-16">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-3xl font-bold text-gray-900">{{ $genre->name }}</h2>
-                    <a href="{{ route('books.by-genre', $genre) }}" class="text-blue-600 hover:text-blue-800 font-semibold">
-                        View All →
-                    </a>
-                </div>
-
-                @if($genre->books->count() > 0)
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        @foreach($genre->books->take(8) as $book)
-                            <div class="group cursor-pointer">
-                                <div class="relative overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                                    <!-- Book Cover -->
-                                    <a href="{{ route('books.show', $book) }}">
-                                        @if($book->cover_image)
-                                            <img src="{{ asset('storage/' . $book->cover_image) }}" 
-                                                 alt="{{ $book->title }}" 
-                                                 class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-300">
-                                        @else
-                                            <div class="w-full h-72 bg-gradient-to-br from-indigo-400 to-pink-500 flex items-center justify-center">
-                                                <div class="text-white text-center p-4">
-                                                    <div class="text-6xl mb-2">📚</div>
-                                                    <p class="font-semibold">{{ $book->title }}</p>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </a>
-                                </div>
-
-                                <!-- Book Info -->
-                                <div class="mt-4">
-                                    <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-gray-900 hover:text-blue-600">
-                                        {{ Str::limit($book->title, 30) }}
-                                    </a>
-                                    <p class="text-gray-600 text-sm mt-1">by {{ $book->author }}</p>
-                                    
-                                    <div class="flex items-center justify-between mt-3">
-                                        <div class="flex items-center">
-                                            <div class="flex text-yellow-400">
-                                                @for($i = 0; $i < 5; $i++)
-                                                    @if($i < round($book->rating))
-                                                        <span>★</span>
-                                                    @else
-                                                        <span class="text-gray-300">★</span>
-                                                    @endif
-                                                @endfor
-                                            </div>
-                                            <span class="text-gray-600 text-sm ml-2">({{ $book->rating_count }})</span>
-                                        </div>
-                                        <span class="text-green-600 font-semibold">${{ number_format($book->price, 2) }}</span>
-                                    </div>
+        <!-- Browse by Genre Section -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Browse by Genre</h2>
+            
+            @if($genres->count() > 0)
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach($genres as $genre)
+                        <a href="{{ route('books.by-genre', $genre) }}" 
+                           class="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 p-6 text-center">
+                            
+                            <!-- Genre Icon -->
+                            <div class="mb-4 flex justify-center">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-3xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                    📚
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="text-gray-600 text-center py-8">No books in this genre yet</p>
-                @endif
-            </section>
-        @empty
-            <p class="text-gray-600 text-center py-8">No genres available</p>
-        @endforelse
+                            
+                            <!-- Genre Name -->
+                            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">
+                                {{ $genre->name }}
+                            </h3>
+                            
+                            <!-- Genre Description -->
+                            @if($genre->description)
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                                    {{ $genre->description }}
+                                </p>
+                            @endif
+                            
+                            <!-- Book Count -->
+                            <div class="pt-4 border-t border-gray-200">
+                                <span class="text-blue-600 font-semibold text-sm">
+                                    {{ $genre->books->count() }} {{ Str::plural('book', $genre->books->count()) }}
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-gray-600 text-center py-12">No genres available</p>
+            @endif
+        </section>
     </div>
 </div>
 @endsection
