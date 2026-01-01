@@ -35,5 +35,8 @@ class DatabaseSeeder extends Seeder
 
         // Create additional test users
         User::factory(5)->create();
+
+        // Run the book seeder
+        $this->call(BookSeeder::class);
     }
 }

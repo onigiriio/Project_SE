@@ -108,8 +108,8 @@
             </div>
 
             <nav class="nav">
-                <a href="#" class="active">Overview</a>
-                <a href="#">Catalog</a>
+                <a href="{{ route('dashboard') }}" class="active">Overview</a>
+                <a href="{{ route('books.catalogue') }}">Book Catalogue</a>
                 <a href="#">Users</a>
                 <a href="#">Analytics</a>
                 <a href="#">Settings</a>
