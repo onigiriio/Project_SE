@@ -23,7 +23,6 @@ class Book extends Model
         'publisher',
         'published_date',
         'cover_image',
-        'price',
         'rating',
         'rating_count',
         'view_count',
@@ -32,7 +31,6 @@ class Book extends Model
 
     protected $casts = [
         'published_date' => 'date',
-        'price' => 'float',
         'rating' => 'float',
     ];
 

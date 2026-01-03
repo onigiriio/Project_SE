@@ -20,7 +20,7 @@ class BookFactory extends Factory
             'publisher' => $this->faker->company(),
             'published_date' => $this->faker->date(),
             'cover_image' => null,
-            'price' => 0.0,
+            
             'rating' => 0,
             'rating_count' => 0,
             'view_count' => 0,

@@ -89,10 +89,8 @@
                         </div>
                     </div>
 
-                    <!-- Price Section -->
-                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 mb-8">
-                        <p class="text-gray-600 text-sm mb-2">Price</p>
-                        <p class="text-4xl font-bold text-green-600">RM {{ number_format($book->price, 2) }}</p>
+                    <!-- Price Section removed -->
+                    <div class="mb-8">
                         @auth
                             <div class="mt-4">
                                 @if(isset($borrowed) && $borrowed)

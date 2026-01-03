@@ -56,7 +56,6 @@
                                 </div>
                                 <span class="text-gray-600 text-sm ml-2">({{ $book->rating_count }})</span>
                             </div>
-                            <span class="text-green-600 font-semibold">RM {{ number_format($book->price, 2) }}</span>
                         </div>
                     </div>
                 </div>
