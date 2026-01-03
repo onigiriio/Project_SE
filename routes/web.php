@@ -27,9 +27,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/books/{book}/reviews', [BookController::class, 'storeReview'])->name('books.store-review');
     Route::post('/books/{book}/borrow', [BookController::class, 'borrow'])->name('books.borrow');
 
-    Route::get('/books', function () {
-        return view('books');
-    })->name('books.index');
+    if (!Route::has('books.index')) {
+        Route::get('/books', [BookController::class, 'index'])->name('books.index');
+    }
 
     Route::get('/books/create', function () {
         // Placeholder for book creation form

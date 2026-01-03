@@ -7,19 +7,29 @@ use App\Models\Genre;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
     /**
      * Display the book catalogue.
      */
-    public function catalogue(): View
+    public function catalogue(Request $request): View
     {
+        $q = $request->query('q', '');
+        $books = Book::query()
+            ->search($q)
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
         $trendingBooks = Book::trending();
         $recommendedBooks = Book::recommended();
         $genres = Genre::with('books')->get();
 
         return view('books.catalogue', [
+            'books' => $books,
+            'q' => $q,
             'trendingBooks' => $trendingBooks,
             'recommendedBooks' => $recommendedBooks,
             'genres' => $genres,
@@ -41,9 +51,9 @@ class BookController extends Controller
             ->paginate(5);
 
         $borrowed = false;
-        if (auth()->check()) {
+        if (Auth::check()) {
             $borrowed = $book->borrows()
-                ->where('user_id', auth()->id())
+                ->where('user_id', Auth::id())
                 ->whereNull('returned_at')
                 ->exists();
         }
@@ -60,12 +70,12 @@ class BookController extends Controller
      */
     public function borrow(Book $book)
     {
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
         $existing = $book->borrows()
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->whereNull('returned_at')
             ->first();
 
@@ -74,7 +84,7 @@ class BookController extends Controller
         }
 
         \App\Models\Borrow::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'book_id' => $book->id,
             'borrowed_at' => now(),
             'status' => 'borrowed',
@@ -110,7 +120,7 @@ class BookController extends Controller
 
         // Check if user already reviewed this book
         $existingReview = Review::where('book_id', $book->id)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->first();
 
         if ($existingReview) {
@@ -121,7 +131,7 @@ class BookController extends Controller
         } else {
             Review::create([
                 'book_id' => $book->id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'rating' => $validated['rating'],
                 'comment' => $validated['comment'],
             ]);
@@ -145,5 +155,30 @@ class BookController extends Controller
             $book->rating_count = $reviews->count();
             $book->save();
         }
+    }
+
+    /**
+     * Search for books and show the catalogue view.
+     */
+    public function index(Request $request)
+    {
+        $q = $request->query('q', '');
+        $books = Book::query()
+            ->search($q)
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $trendingBooks = Book::trending();
+        $recommendedBooks = Book::recommended();
+        $genres = Genre::with('books')->get();
+
+        return view('books.catalogue', [
+            'books' => $books,
+            'q' => $q,
+            'trendingBooks' => $trendingBooks,
+            'recommendedBooks' => $recommendedBooks,
+            'genres' => $genres,
+        ]);
     }
 }

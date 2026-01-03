@@ -9,6 +9,21 @@
             <p class="text-lg text-gray-600">Explore our curated collection of books</p>
         </div>
 
+        <!-- Search Form -->
+        <form method="GET" action="{{ route('books.index') }}" class="mb-3">
+            <div class="input-group">
+                <input type="search" name="q" value="{{ old('q', request('q')) }}" class="form-control" placeholder="Search by title, author or description">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+                @if(request('q'))
+                    <a href="{{ route('books.index') }}" class="btn btn-link">Clear</a>
+                @endif
+            </div>
+        </form>
+
+        @if($books->total() === 0)
+            <div class="alert alert-info">No books found{{ request('q') ? " for \"".e(request('q'))."\"" : '' }}.</div>
+        @endif
+
         <!-- Trending Books Section -->
         <section class="mb-16">
             <h2 class="text-3xl font-bold text-gray-900 mb-6">Trending Now</h2>
@@ -168,6 +183,63 @@
             @else
                 <p class="text-gray-600 text-center py-12">No genres available</p>
             @endif
+        </section>
+
+        <!-- Books Listing Section -->
+        <section>
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">All Books</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                @foreach($books as $book)
+                    <div class="group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                            <!-- Book Cover -->
+                            <a href="{{ route('books.show', $book) }}">
+                                @if($book->cover_image)
+                                    <img src="{{ asset('storage/' . $book->cover_image) }}" 
+                                         alt="{{ $book->title }}" 
+                                         class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-300">
+                                @else
+                                    <div class="w-full h-72 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                                        <div class="text-white text-center p-4">
+                                            <div class="text-6xl mb-2">📚</div>
+                                            <p class="font-semibold">{{ $book->title }}</p>
+                                        </div>
+                                    </div>
+                                @endif
+                            </a>
+                        </div>
+
+                        <!-- Book Info -->
+                        <div class="mt-4">
+                            <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-gray-900 hover:text-blue-600">
+                                {{ Str::limit($book->title, 30) }}
+                            </a>
+                            <p class="text-gray-600 text-sm mt-1">by {{ $book->author }}</p>
+                            
+                            <div class="flex items-center justify-between mt-3">
+                                <div class="flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        @for($i = 0; $i < 5; $i++)
+                                            @if($i < round($book->rating))
+                                                <span>★</span>
+                                            @else
+                                                <span class="text-gray-300">★</span>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <span class="text-gray-600 text-sm ml-2">({{ $book->rating_count }})</span>
+                                </div>
+                                <span class="text-green-600 font-semibold">RM {{ number_format($book->price, 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-8">
+                {{ $books->links() }}
+            </div>
         </section>
     </div>
 </div>

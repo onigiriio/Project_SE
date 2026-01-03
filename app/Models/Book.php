@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\Borrow;
 
 class Book extends Model
@@ -85,5 +87,27 @@ class Book extends Model
     public function incrementViewCount()
     {
         $this->increment('view_count');
+    }
+
+    /**
+     * Scope a query to search books by a free-text term (title, author, description).
+     */
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        $term = trim((string) $term);
+        if ($term === '') {
+            return $query;
+        }
+
+        $like = '%' . str_replace(' ', '%', $term) . '%';
+
+        return $query->where(function ($q) use ($like) {
+            $q->where('title', 'like', $like)
+              ->orWhere('author', 'like', $like);
+
+            if (Schema::hasColumn('books', 'description')) {
+                $q->orWhere('description', 'like', $like);
+            }
+        });
     }
 }
