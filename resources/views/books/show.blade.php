@@ -89,10 +89,21 @@
                         </div>
                     </div>
 
-                    <!-- Price Section removed -->
+                    <!-- Action Buttons -->
                     <div class="mb-8">
                         @auth
-                            <div class="mt-4">
+                            @if(auth()->user()->user_type === 'librarian')
+                                <!-- Librarian Actions -->
+                                <div class="flex gap-3">
+                                    <a href="{{ route('books.edit', $book) }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold">Edit Book</a>
+                                    <form action="{{ route('books.destroy', $book) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this book?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-semibold">Delete Book</button>
+                                    </form>
+                                </div>
+                            @else
+                                <!-- Regular User Actions -->
                                 @if(isset($borrowed) && $borrowed)
                                     <button disabled class="px-4 py-2 bg-gray-400 text-white rounded-md font-semibold">Already Borrowed</button>
                                 @else
@@ -101,7 +112,7 @@
                                         <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold">Borrow Book</button>
                                     </form>
                                 @endif
-                            </div>
+                            @endif
                         @else
                             <div class="mt-4">
                                 <a href="{{ route('login') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold">Log in to Borrow</a>

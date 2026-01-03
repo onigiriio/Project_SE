@@ -8,6 +8,7 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -180,5 +181,108 @@ class BookController extends Controller
             'recommendedBooks' => $recommendedBooks,
             'genres' => $genres,
         ]);
+    }
+
+    /**
+     * Show the form for creating a new book.
+     */
+    public function create()
+    {
+        $genres = Genre::all();
+        return view('books.create', compact('genres'));
+    }
+
+    /**
+     * Store a newly created book.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'isbn' => 'required|string|max:20|unique:books',
+            'description' => 'required|string',
+            'pages' => 'required|integer|min:1',
+            'publisher' => 'required|string|max:255',
+            'published_date' => 'required|date',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'genre_ids' => 'array',
+            'genre_ids.*' => 'exists:genres,id',
+        ]);
+
+        $book = Book::create($validated);
+
+        // Handle cover image upload
+        if ($request->hasFile('cover_image')) {
+            $imagePath = $request->file('cover_image')->store('book-covers', 'public');
+            $book->update(['cover_image' => $imagePath]);
+        }
+
+        // Attach genres
+        if (isset($validated['genre_ids'])) {
+            $book->genres()->attach($validated['genre_ids']);
+        }
+
+        return redirect()->route('books.show', $book)->with('success', 'Book created successfully!');
+    }
+
+    /**
+     * Show the form for editing a book.
+     */
+    public function edit(Book $book)
+    {
+        $genres = Genre::all();
+        return view('books.edit', compact('book', 'genres'));
+    }
+
+    /**
+     * Update the specified book.
+     */
+    public function update(Request $request, Book $book)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'isbn' => 'required|string|max:20|unique:books,isbn,' . $book->id,
+            'description' => 'required|string',
+            'pages' => 'required|integer|min:1',
+            'publisher' => 'required|string|max:255',
+            'published_date' => 'required|date',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'genre_ids' => 'array',
+            'genre_ids.*' => 'exists:genres,id',
+        ]);
+
+        $book->update($validated);
+
+        // Handle cover image upload
+        if ($request->hasFile('cover_image')) {
+            // Delete old image if exists
+            if ($book->cover_image) {
+                \Storage::disk('public')->delete($book->cover_image);
+            }
+            $imagePath = $request->file('cover_image')->store('book-covers', 'public');
+            $book->update(['cover_image' => $imagePath]);
+        }
+
+        // Sync genres
+        $book->genres()->sync($validated['genre_ids'] ?? []);
+
+        return redirect()->route('books.show', $book)->with('success', 'Book updated successfully!');
+    }
+
+    /**
+     * Remove the specified book.
+     */
+    public function destroy(Book $book)
+    {
+        // Delete cover image if exists
+        if ($book->cover_image) {
+            \Storage::disk('public')->delete($book->cover_image);
+        }
+
+        $book->delete();
+
+        return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
     }
 }
