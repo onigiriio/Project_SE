@@ -1,21 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 py-12">
+<div class="min-h-screen py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">Book Catalogue</h1>
-            <p class="text-lg text-gray-600">Explore our curated collection of books</p>
+            <h1 class="text-4xl font-bold text-white mb-4">Book Catalogue</h1>
+            <p class="text-lg text-gray-300">Explore our curated collection of books</p>
         </div>
 
         <!-- Search Form -->
-        <form method="GET" action="{{ route('books.index') }}" class="mb-3">
-            <div class="input-group">
-                <input type="search" name="q" value="{{ old('q', request('q')) }}" class="form-control" placeholder="Search by title, author or description">
-                <button class="btn btn-outline-secondary" type="submit">Search</button>
+        <form method="GET" action="{{ route('books.index') }}" class="mb-6">
+            <div class="flex gap-3 items-center">
+                        <div class="relative flex-1">
+                    <input aria-label="Search books" type="search" name="q" value="{{ old('q', request('q')) }}" class="w-full rounded-md border border-gray-200 px-4 py-3 shadow-md bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Search by title, author or description">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
+                </div>
+                <button class="px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md font-semibold shadow hover:opacity-95 transition" type="submit">Search</button>
                 @if(request('q'))
-                    <a href="{{ route('books.index') }}" class="btn btn-link">Clear</a>
+                    <a href="{{ route('books.index') }}" class="px-4 py-3 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition">Clear</a>
                 @endif
             </div>
         </form>
@@ -24,9 +27,23 @@
             <div class="alert alert-info">No books found{{ request('q') ? " for \"".e(request('q'))."\"" : '' }}.</div>
         @endif
 
-        <!-- Trending Books Section -->
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Trending Now</h2>
+        <!-- Section Switcher Buttons -->
+        <div class="mb-6">
+            <div class="inline-flex items-center gap-2 bg-transparent p-2 rounded-md">
+                <button id="all-btn" aria-pressed="true" class="px-4 py-2 rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-sm hover:opacity-95 transition section-btn">All Books</button>
+                <button id="trending-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition section-btn">Trending Now</button>
+                <button id="recommended-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition section-btn">Recommended</button>
+                <button id="browse-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition section-btn">Browse by Genre</button>
+            </div>
+        </div>
+
+        <div id="sections-wrapper">
+            <!-- Trending Books Section -->
+            <section id="trending-section" class="mb-16" style="display:none;">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-3xl font-bold text-white mb-6">Trending Now</h2>
+                    <button id="back-from-trending" class="px-3 py-2 rounded-md bg-transparent text-white border border-white/10 hover:bg-white/5 transition">Back to All Books</button>
+                </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @forelse($trendingBooks as $book)
                     <div class="group cursor-pointer">
@@ -55,10 +72,10 @@
 
                         <!-- Book Info -->
                         <div class="mt-4">
-                            <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-gray-900 hover:text-blue-600">
+                            <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-white hover:text-blue-400">
                                 {{ Str::limit($book->title, 30) }}
                             </a>
-                            <p class="text-gray-600 text-sm mt-1">by {{ $book->author }}</p>
+                            <p class="text-gray-300 text-sm mt-1">by {{ $book->author }}</p>
                             
                             <div class="flex items-center justify-between mt-3">
                                 <div class="flex items-center">
@@ -84,8 +101,11 @@
         </section>
 
         <!-- Recommended Books Section -->
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Recommended For You</h2>
+        <section id="recommended-section" class="mb-16" style="display:none;">
+            <div class="flex justify-between items-center">
+                <h2 class="text-3xl font-bold text-white mb-6">Recommended For You</h2>
+                <button id="back-from-recommended" class="px-3 py-2 rounded-md bg-transparent text-white border border-white/10 hover:bg-white/5 transition">Back to All Books</button>
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @forelse($recommendedBooks as $book)
                     <div class="group cursor-pointer">
@@ -114,10 +134,10 @@
 
                         <!-- Book Info -->
                         <div class="mt-4">
-                            <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-gray-900 hover:text-blue-600">
+                            <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-white hover:text-blue-400">
                                 {{ Str::limit($book->title, 30) }}
                             </a>
-                            <p class="text-gray-600 text-sm mt-1">by {{ $book->author }}</p>
+                            <p class="text-gray-300 text-sm mt-1">by {{ $book->author }}</p>
                             
                             <div class="flex items-center justify-between mt-3">
                                 <div class="flex items-center">
@@ -143,8 +163,11 @@
         </section>
 
         <!-- Browse by Genre Section -->
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Browse by Genre</h2>
+        <section id="browse-section" class="mb-16" style="display:none;">
+            <div class="flex justify-between items-center">
+                <h2 class="text-3xl font-bold text-white mb-6">Browse by Genre</h2>
+                <button id="back-from-browse" class="px-3 py-2 rounded-md bg-transparent text-white border border-white/10 hover:bg-white/5 transition">Back to All Books</button>
+            </div>
             
             @if($genres->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -187,7 +210,7 @@
 
         <!-- Books Listing Section -->
         <section>
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">All Books</h2>
+            <h2 class="text-3xl font-bold text-white mb-6">All Books</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach($books as $book)
                     <div class="group cursor-pointer">
@@ -211,10 +234,10 @@
 
                         <!-- Book Info -->
                         <div class="mt-4">
-                            <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-gray-900 hover:text-blue-600">
+                            <a href="{{ route('books.show', $book) }}" class="text-lg font-semibold text-white hover:text-blue-400">
                                 {{ Str::limit($book->title, 30) }}
                             </a>
-                            <p class="text-gray-600 text-sm mt-1">by {{ $book->author }}</p>
+                            <p class="text-gray-300 text-sm mt-1">by {{ $book->author }}</p>
                             
                             <div class="flex items-center justify-between mt-3">
                                 <div class="flex items-center">
@@ -241,6 +264,72 @@
                 {{ $books->links() }}
             </div>
         </section>
+        </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sections = {
+        all: document.getElementById('all-section') || document.getElementById('all-section'),
+        trending: document.getElementById('trending-section'),
+        recommended: document.getElementById('recommended-section'),
+        browse: document.getElementById('browse-section'),
+    };
+    const buttons = {
+        all: document.getElementById('all-btn'),
+        trending: document.getElementById('trending-btn'),
+        recommended: document.getElementById('recommended-btn'),
+        browse: document.getElementById('browse-btn'),
+    };
+
+    function show(name) {
+        Object.keys(sections).forEach(k => {
+            const el = sections[k];
+            if (!el) return;
+            el.style.display = (k === name) ? '' : 'none';
+        });
+
+        Object.keys(buttons).forEach(k => {
+            const b = buttons[k];
+            if (!b) return;
+
+            if (k === name) {
+                b.setAttribute('aria-pressed', 'true');
+                b.classList.remove('bg-white','text-gray-900','border','border-gray-200');
+                b.classList.add('bg-gradient-to-r','from-blue-500','to-purple-600','text-white','shadow-sm');
+            } else {
+                b.setAttribute('aria-pressed', 'false');
+                b.classList.remove('bg-gradient-to-r','from-blue-500','to-purple-600','text-white','shadow-sm');
+                b.classList.add('bg-white','text-gray-900','border','border-gray-200');
+            }
+        });
+
+        const el = sections[name];
+        if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    buttons.all && buttons.all.addEventListener('click', () => show('all'));
+    buttons.trending && buttons.trending.addEventListener('click', () => show('trending'));
+    buttons.recommended && buttons.recommended.addEventListener('click', () => show('recommended'));
+    buttons.browse && buttons.browse.addEventListener('click', () => show('browse'));
+
+    document.getElementById('back-from-trending')?.addEventListener('click', () => show('all'));
+    document.getElementById('back-from-recommended')?.addEventListener('click', () => show('all'));
+    document.getElementById('back-from-browse')?.addEventListener('click', () => show('all'));
+
+    // If 'section' query param present, show that section (e.g., ?section=trending)
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const sectionParam = params.get('section');
+        if (sectionParam && sections[sectionParam]) {
+            show(sectionParam);
+        } else {
+            show('all');
+        }
+    } catch (e) {
+        show('all');
+    }
+});
+</script>
 @endsection
