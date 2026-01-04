@@ -57,3 +57,45 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+## Database (MySQL) ✅
+
+This project uses **MySQL** as the primary database. If you were previously using SQLite, do the following to switch to MySQL:
+
+1. Create a MySQL database (example names used in this repo):
+
+   - Project database: `Project_SE`
+   - Test database: `Project_SE_testing`
+
+   Example (MySQL client):
+   ```sql
+   CREATE DATABASE Project_SE CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE DATABASE Project_SE_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+2. Update your `.env` (or `.env.example`) with MySQL credentials:
+
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=Project_SE
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+3. Run migrations and seeders:
+
+   ```bash
+   php artisan migrate --seed
+   ```
+
+4. To run tests, ensure the test DB exists and the `phpunit.xml` entries for `DB_*` are correct, then run:
+
+   ```bash
+   php artisan test
+   ```
+
+If you need help creating the MySQL user/database or updating CI, let me know and I can add example commands. 

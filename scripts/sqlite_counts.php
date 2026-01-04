@@ -1,17 +1,17 @@
 <?php
-$path = __DIR__ . '/../database/database.sqlite';
-if (!file_exists($path)) {
-    echo "SQLite file not found: $path\n";
-    exit(1);
-}
-$db = new PDO('sqlite:' . $path);
+require __DIR__ . '/../vendor/autoload.php';
+use Illuminate\Support\Facades\DB;
+
+$app = require __DIR__ . '/../bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
+
 $tables = [
     'users','genres','books','book_genre','reviews','borrows'
 ];
 foreach ($tables as $t) {
     try {
-        $stmt = $db->query("SELECT COUNT(*) as c FROM $t");
-        $c = $stmt->fetch(PDO::FETCH_ASSOC)['c'];
+        $c = DB::table($t)->count();
         echo "$t: $c\n";
     } catch (Exception $e) {
         echo "$t: error (" . $e->getMessage() . ")\n";
