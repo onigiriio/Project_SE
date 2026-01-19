@@ -21,6 +21,8 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [DashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/my-borrows', [DashboardController::class, 'borrows'])->name('borrows');
     
     // Membership routes
     Route::post('/membership/upgrade', [MembershipController::class, 'upgrade'])->name('membership.upgrade');

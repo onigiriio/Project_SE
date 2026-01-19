@@ -44,7 +44,7 @@
         <a href="{{ route('dashboard') }}" class="nav-link">Overview</a>
         <a href="{{ route('profile') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">My Profile</a>
         <a href="{{ route('books.catalogue') }}" class="nav-link">Book Catalogue</a>
-        <a href="#" class="nav-link">My Borrows</a>
+        <a href="{{ route('borrows') }}" class="nav-link">My Borrows</a>
     </nav>
 
     <div class="mt-4 border-t border-[#9aa6c7]/10 pt-4">
@@ -72,13 +72,17 @@
         <!-- Profile Header -->
         <div class="glass-panel p-6 rounded-lg">
             <div class="flex items-start gap-6">
-                <div class="w-24 h-24 rounded-lg bg-gradient-to-br from-[#00d4ff] to-[#a855f7] flex items-center justify-center font-bold text-3xl text-[#050714]">
-                    {{ strtoupper(substr(optional(auth()->user())->name ?? 'U',0,1)) }}
-                </div>
+                @if(auth()->user()->avatar)
+                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->username }}" class="w-24 h-24 rounded-lg object-cover shadow-lg">
+                @else
+                    <div class="w-24 h-24 rounded-lg bg-gradient-to-br from-[#00d4ff] to-[#a855f7] flex items-center justify-center font-bold text-3xl text-[#050714]">
+                        {{ strtoupper(substr(optional(auth()->user())->name ?? 'U',0,1)) }}
+                    </div>
+                @endif
                 <div class="flex-1">
                     <h1 class="text-3xl font-bold text-white mb-2">{{ auth()->user()->name ?? auth()->user()->username }}</h1>
                     <p class="text-[#9aa6c7] mb-4">{{ auth()->user()->email }}</p>
-                    <a href="#" class="px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-sm hover:opacity-90 transition">
+                    <a href="#" onclick="openEditProfile()" class="px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-sm hover:opacity-90 transition">
                         Edit Profile
                     </a>
                 </div>
@@ -170,7 +174,7 @@
                 <a href="{{ route('books.catalogue') }}" class="px-4 py-3 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-center hover:opacity-90 transition">
                     Browse Catalogue
                 </a>
-                <a href="#" class="px-4 py-3 bg-white/5 text-[#9aa6c7] rounded-md font-bold text-center hover:bg-white/10 transition">
+                <a href="{{ route('borrows') }}" class="px-4 py-3 bg-white/5 text-[#9aa6c7] rounded-md font-bold text-center hover:bg-white/10 transition">
                     My Borrows
                 </a>
             </div>
@@ -241,6 +245,77 @@ document.getElementById('upgradeModal')?.addEventListener('click', (e) => {
     if (e.target.id === 'upgradeModal') {
         closeUpgradeModal();
     }
+});
+</script>
+
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-[#050714] border border-white/10 rounded-lg shadow-2xl p-8 max-w-lg w-full mx-4">
+        <h2 class="text-2xl font-bold text-[#e6eef8] mb-4">Edit Profile</h2>
+
+        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="text-sm text-[#9aa6c7]">Profile Image</label>
+                    @if(auth()->user()->avatar)
+                        <div class="mt-2 mb-2">
+                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-20 h-20 rounded-md object-cover" alt="avatar">
+                        </div>
+                    @endif
+                    <input type="file" name="avatar" accept="image/*" class="w-full text-sm text-white/80">
+                    @error('avatar')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="text-sm text-[#9aa6c7]">Username</label>
+                    <input type="text" name="username" value="{{ old('username', auth()->user()->username) }}" required class="mt-1 w-full rounded-md p-2 bg-white/3 text-black">
+                    @error('username')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="text-sm text-[#9aa6c7]">Email</label>
+                    <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" required class="mt-1 w-full rounded-md p-2 bg-white/3 text-black">
+                    @error('email')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="text-sm text-[#9aa6c7]">New Password (leave blank to keep current)</label>
+                    <input type="password" name="password" class="mt-1 w-full rounded-md p-2 bg-white/3 text-black" autocomplete="new-password">
+                    @error('password')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="text-sm text-[#9aa6c7]">Confirm New Password</label>
+                    <input type="password" name="password_confirmation" class="mt-1 w-full rounded-md p-2 bg-white/3 text-black" autocomplete="new-password">
+                </div>
+            </div>
+
+            <div class="mt-4 flex gap-3 justify-end">
+                <button type="button" onclick="closeEditProfile()" class="px-4 py-2 border border-[#9aa6c7] text-[#9aa6c7] rounded-md">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditProfile() {
+    document.getElementById('editProfileModal').classList.remove('hidden');
+}
+function closeEditProfile() {
+    document.getElementById('editProfileModal').classList.add('hidden');
+}
+
+// Close modal on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeEditProfile();
+});
+
+// Close when clicking outside
+document.getElementById('editProfileModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'editProfileModal') closeEditProfile();
 });
 </script>
 

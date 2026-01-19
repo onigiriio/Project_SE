@@ -28,6 +28,7 @@ class User extends Authenticatable
         'membership_date',
         'membership_duration',
         'membership_expiry',
+        'avatar',
     ];
 
     /**

@@ -44,7 +44,7 @@
         <a href="{{ route('dashboard') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Overview</a>
         <a href="{{ route('profile') }}" class="nav-link">My Profile</a>
         <a href="{{ route('books.catalogue') }}" class="nav-link">Book Catalogue</a>
-        <a href="#" class="nav-link">My Borrows</a>
+        <a href="{{ route('borrows') }}" class="nav-link">My Borrows</a>
     </nav>
 
     <div class="mt-4 border-t border-[#9aa6c7]/10 pt-4">
