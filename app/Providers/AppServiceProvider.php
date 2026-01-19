@@ -20,7 +20,30 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Book management gate
         Gate::define('manage-books', function ($user) {
+            return $user->user_type === 'librarian';
+        });
+
+        // User management gate
+        Gate::define('manage-users', function ($user) {
+            return $user->user_type === 'librarian';
+        });
+
+        // Fine management gates
+        Gate::define('view-all-fines', function ($user) {
+            return $user->user_type === 'librarian';
+        });
+
+        Gate::define('create-fine', function ($user) {
+            return $user->user_type === 'librarian';
+        });
+
+        Gate::define('update-fine', function ($user) {
+            return $user->user_type === 'librarian';
+        });
+
+        Gate::define('delete-fine', function ($user) {
             return $user->user_type === 'librarian';
         });
     }

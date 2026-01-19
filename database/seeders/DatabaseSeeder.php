@@ -38,5 +38,8 @@ class DatabaseSeeder extends Seeder
 
         // Run the book seeder
         $this->call(BookSeeder::class);
+
+        // Run the fine seeder
+        $this->call(FineSeeder::class);
     }
 }
