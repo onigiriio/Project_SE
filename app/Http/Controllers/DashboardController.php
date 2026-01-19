@@ -11,7 +11,7 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         if ($user->user_type === 'librarian') {
-            return view('dashboard-librarian');
+            return redirect()->route('librarian.dashboard');
         }
 
         return view('dashboard');

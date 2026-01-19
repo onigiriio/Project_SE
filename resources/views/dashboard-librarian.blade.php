@@ -16,12 +16,9 @@
             </div>
 
             <nav class="flex flex-col gap-2 mb-4">
-                <a href="{{ route('dashboard') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Dashboard</a>
-                <a href="{{ route('books.index') }}" class="nav-link">Manage Books</a>
-                <a href="#" class="nav-link">Manage Users</a>
-                <a href="#" class="nav-link">Borrow Records</a>
-                <a href="#" class="nav-link">Reports</a>
-                <a href="#" class="nav-link">Settings</a>
+                <a href="{{ route('librarian.dashboard') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Overview</a>
+                <a href="{{ route('books.catalogue') }}" class="nav-link">Manage Books</a>
+                <a href="{{ route('librarian.users') }}" class="nav-link">Manage Users</a>
             </nav>
 
             <div class="mt-4 border-t border-[#9aa6c7]/10 pt-4">

@@ -97,7 +97,7 @@
             <button class="absolute top-4 right-4 lg:hidden text-[#9aa6c7] hover:text-[#e6eef8] text-2xl" onclick="closeSidebar()">×</button>
             
             <div class="flex items-center gap-3 mb-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">LH</div>
+                <img src="/images/libraryHub-icon.svg" alt="LibraryHub" class="w-12 h-12">
                 <div>
                     <div class="font-semibold">LibraryHub</div>
                     <div class="text-xs text-[#9aa6c7]">Menu</div>

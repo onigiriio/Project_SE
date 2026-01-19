@@ -35,7 +35,8 @@
         .form-group{margin-bottom:16px}
         label{display:block;font-weight:700;margin-bottom:6px;color:#e6eef8;font-size:0.95rem}
         input[type="text"], input[type="email"], input[type="password"], textarea{width:100%;padding:11px;border:1px solid rgba(0,212,255,0.2);border-radius:10px;background:rgba(0,212,255,0.05);color:#e6eef8;font-size:0.95rem;transition:all 0.3s;font-family:inherit}
-        select{width:100%;padding:11px;border:1px solid rgba(0,212,255,0.2);border-radius:10px;background:rgba(0,212,255,0.05);color:#000;font-size:0.95rem;transition:all 0.3s;font-family:inherit}
+        select{width:100%;padding:11px;border:1px solid rgba(0,212,255,0.2);border-radius:10px;background:rgba(0,212,255,0.05);color:#e6eef8;font-size:0.95rem;transition:all 0.3s;font-family:inherit}
+        select option{color:#000;background:#fff;}
         input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-a);box-shadow:0 0 20px rgba(0,212,255,0.2)}
         input::placeholder{color:rgba(154,166,199,0.6)}
         select{background:rgba(0,212,255,0.05) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="none" stroke="%239aa6c7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 5l6 6 6-6"/></svg>') no-repeat right 10px center;background-size:18px;padding-right:30px;appearance:none}
@@ -119,7 +120,7 @@
 
                 <div class="form-group">
                     <label for="user_type">User Type</label>
-                    <select id="user_type" name="user_type" required>
+                    <select id="user_type" name="user_type" required onchange="toggleMembershipSection()">
                         <option value="">Select user type</option>
                         <option value="user" @selected(old('user_type') === 'user')>Regular User</option>
                         <option value="librarian" @selected(old('user_type') === 'librarian')>Librarian</option>
@@ -127,25 +128,27 @@
                     @error('user_type')<p class="error-msg">{{ $message }}</p>@enderror
                 </div>
 
-                <div class="form-group">
-                    <label>Membership</label>
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="membership_yes" name="membership" value="yes" @checked(old('membership') === 'yes') required onchange="toggleMembershipOptions()">
-                            <label for="membership_yes">Yes, I want a membership</label>
+                <!-- Membership Section (hidden for librarians) -->
+                <div id="membershipSection" style="display: {{ old('user_type') === 'librarian' ? 'none' : 'block' }};">
+                    <div class="form-group">
+                        <label>Membership</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="membership_yes" name="membership" value="yes" @checked(old('membership') === 'yes') onchange="toggleMembershipOptions()">
+                                <label for="membership_yes">Yes, I want a membership</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="membership_no" name="membership" value="no" @checked(old('membership') === 'no' || old('membership') === null) onchange="toggleMembershipOptions()">
+                                <label for="membership_no">No, I don't want membership</label>
+                            </div>
                         </div>
-                        <div class="radio-item">
-                            <input type="radio" id="membership_no" name="membership" value="no" @checked(old('membership') === 'no' || old('membership') === null) required onchange="toggleMembershipOptions()">
-                            <label for="membership_no">No, I don't want membership</label>
-                        </div>
+                        @error('membership')<p class="error-msg">{{ $message }}</p>@enderror
                     </div>
-                    @error('membership')<p class="error-msg">{{ $message }}</p>@enderror
-                </div>
 
-                <!-- Membership Duration Options (shown when "Yes" is selected) -->
-                <div id="membershipOptions" class="form-group" style="display: {{ old('membership') === 'yes' ? 'block' : 'none' }};">
-                    <label>Select Membership Duration</label>
-                    <div class="radio-group">
+                    <!-- Membership Duration Options (shown when "Yes" is selected) -->
+                    <div id="membershipOptions" class="form-group" style="display: {{ old('membership') === 'yes' ? 'block' : 'none' }};">
+                        <label>Select Membership Duration</label>
+                        <div class="radio-group">
                         <div class="radio-item">
                             <input type="radio" id="duration_1" name="membership_duration" value="1" @checked(old('membership_duration') === '1')>
                             <label for="duration_1">1 Month — RM 15.00</label>
@@ -178,6 +181,26 @@
     </div>
 
     <script>
+        function toggleMembershipSection() {
+            const userType = document.getElementById('user_type').value;
+            const membershipSection = document.getElementById('membershipSection');
+            const membershipYes = document.getElementById('membership_yes');
+            const membershipNo = document.getElementById('membership_no');
+            
+            if (userType === 'librarian') {
+                membershipSection.style.display = 'none';
+                // Clear membership values for librarians
+                membershipYes.checked = false;
+                membershipNo.checked = false;
+            } else {
+                membershipSection.style.display = 'block';
+                // Set default value for regular users
+                if (!membershipYes.checked && !membershipNo.checked) {
+                    membershipNo.checked = true;
+                }
+            }
+        }
+
         function toggleMembershipOptions() {
             const membershipYes = document.getElementById('membership_yes');
             const membershipOptions = document.getElementById('membershipOptions');

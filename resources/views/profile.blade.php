@@ -33,7 +33,7 @@
     <button class="block absolute top-4 right-4 text-[#9aa6c7] hover:text-[#e6eef8] text-2xl" onclick="closeSidebar()">×</button>
     
     <div class="flex items-center gap-3 mb-4">
-        <div class="w-12 h-12 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">LH</div>
+        <img src="/images/libraryHub-icon.svg" alt="LibraryHub" class="w-12 h-12">
         <div>
             <div class="font-semibold">LibraryHub</div>
             <div class="text-xs text-[#9aa6c7]">Menu</div>
@@ -114,18 +114,24 @@
         </div>
 
         <!-- Account Statistics -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass-panel p-6 rounded-lg">
+        @php
+            $totalBorrowed = auth()->user()->borrows()->count();
+            $activeBorrows = auth()->user()->borrows()->whereNull('returned_at')->count();
+            $totalReviews = auth()->user()->reviews()->count();
+        @endphp
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#00d4ff]">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[#9aa6c7] text-sm">Member Since</p>
                         <p class="text-2xl font-bold text-white mt-2">{{ auth()->user()->created_at->format('M Y') }}</p>
+                        <p class="text-xs text-[#9aa6c7] mt-1">{{ auth()->user()->created_at->diffForHumans() }}</p>
                     </div>
                     <div class="text-4xl">📅</div>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 rounded-lg">
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#a855f7]">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[#9aa6c7] text-sm">Account Type</p>
@@ -135,13 +141,25 @@
                 </div>
             </div>
 
-            <div class="glass-panel p-6 rounded-lg">
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#00d4ff]">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-[#9aa6c7] text-sm">Books Borrowed</p>
-                        <p class="text-2xl font-bold text-white mt-2">{{ $borrowHistory->total() }}</p>
+                        <p class="text-[#9aa6c7] text-sm">Total Borrowed</p>
+                        <p class="text-2xl font-bold text-white mt-2">{{ $totalBorrowed }}</p>
+                        <p class="text-xs text-[#9aa6c7] mt-1">All time</p>
                     </div>
                     <div class="text-4xl">📚</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#a855f7]">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Active Borrows</p>
+                        <p class="text-2xl font-bold text-white mt-2">{{ $activeBorrows }}</p>
+                        <p class="text-xs text-[#9aa6c7] mt-1">Currently reading</p>
+                    </div>
+                    <div class="text-4xl">🎯</div>
                 </div>
             </div>
         </div>
@@ -168,15 +186,72 @@
         </div>
 
         <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass-panel p-6 rounded-lg">
+                <h3 class="font-bold text-white mb-3">🔍 Browse Books</h3>
+                <p class="text-sm text-[#9aa6c7] mb-4">Explore our collection of books</p>
+                <a href="{{ route('books.catalogue') }}" class="px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-sm w-full text-center block hover:opacity-90 transition">
+                    Go to Catalogue
+                </a>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg">
+                <h3 class="font-bold text-white mb-3">📖 Your Borrows</h3>
+                <p class="text-sm text-[#9aa6c7] mb-4">View your borrowing history</p>
+                <a href="{{ route('borrows') }}" class="px-4 py-2 bg-white/5 text-[#9aa6c7] rounded-md font-bold text-sm w-full text-center block hover:bg-white/10 transition">
+                    View History
+                </a>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg">
+                <h3 class="font-bold text-white mb-3">✏️ Edit Profile</h3>
+                <p class="text-sm text-[#9aa6c7] mb-4">Update your account details</p>
+                <button onclick="openEditProfile()" class="px-4 py-2 bg-white/5 text-[#9aa6c7] rounded-md font-bold text-sm w-full hover:bg-white/10 transition">
+                    Edit Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Borrowed Books -->
         <div class="glass-panel p-6 rounded-lg">
-            <h2 class="text-xl font-bold text-white mb-4">Quick Actions</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <a href="{{ route('books.catalogue') }}" class="px-4 py-3 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-center hover:opacity-90 transition">
-                    Browse Catalogue
-                </a>
-                <a href="{{ route('borrows') }}" class="px-4 py-3 bg-white/5 text-[#9aa6c7] rounded-md font-bold text-center hover:bg-white/10 transition">
-                    My Borrows
-                </a>
+            <h2 class="text-xl font-bold text-white mb-4">📚 Recent Borrowed Books</h2>
+            @php $recentBorrows = auth()->user()->borrows()->with('book')->latest()->take(4)->get(); @endphp
+            @if($recentBorrows->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    @foreach($recentBorrows as $borrow)
+                        <div class="bg-white/5 p-4 rounded-lg hover:bg-white/10 transition">
+                            <p class="text-white font-semibold text-sm truncate">{{ $borrow->book->title }}</p>
+                            <p class="text-[#9aa6c7] text-xs mt-1">by {{ $borrow->book->author }}</p>
+                            <p class="text-xs text-[#9aa6c7] mt-2">{{ $borrow->created_at->format('M d, Y') }}</p>
+                            @if($borrow->returned_at)
+                                <span class="inline-block mt-2 px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">Returned</span>
+                            @else
+                                <span class="inline-block mt-2 px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded">Active</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-[#9aa6c7] text-center py-8">No borrow history yet. <a href="{{ route('books.catalogue') }}" class="text-[#00d4ff]">Start browsing</a></p>
+            @endif
+        </div>
+
+        <!-- Reading Preferences (if reviews exist) -->
+        <div class="glass-panel p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-white mb-4">⭐ Your Activity</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white/5 p-4 rounded-lg">
+                    <p class="text-[#9aa6c7] text-sm">Total Borrowed</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $totalBorrowed }}</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg">
+                    <p class="text-[#9aa6c7] text-sm">Active Borrows</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $activeBorrows }}</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg">
+                    <p class="text-[#9aa6c7] text-sm">Reviews Written</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ $totalReviews }}</p>
+                </div>
             </div>
         </div>
     </main>

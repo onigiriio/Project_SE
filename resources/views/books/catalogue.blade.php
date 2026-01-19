@@ -39,10 +39,16 @@
     </div>
 
     <nav class="flex flex-col gap-2 mb-4">
-        <a href="{{ route('dashboard') }}" class="nav-link">Overview</a>
-        <a href="{{ route('profile') }}" class="nav-link">My Profile</a>
-        <a href="{{ route('books.catalogue') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Book Catalogue</a>
-        <a href="{{ route('borrows') }}" class="nav-link">My Borrows</a>
+        @if(auth()->user()->user_type === 'librarian')
+            <a href="{{ route('librarian.dashboard') }}" class="nav-link">Dashboard</a>
+            <a href="{{ route('books.catalogue') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Browse Catalogue</a>
+            <a href="{{ route('librarian.users') }}" class="nav-link">Manage Users</a>
+        @else
+            <a href="{{ route('dashboard') }}" class="nav-link">Overview</a>
+            <a href="{{ route('profile') }}" class="nav-link">My Profile</a>
+            <a href="{{ route('books.catalogue') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Book Catalogue</a>
+            <a href="{{ route('borrows') }}" class="nav-link">My Borrows</a>
+        @endif
     </nav>
 
     <div class="mt-4 border-t border-[#9aa6c7]/10 pt-4">
@@ -76,12 +82,12 @@
         <form method="GET" action="{{ route('books.index') }}" class="mb-6">
             <div class="flex gap-3 items-center">
                         <div class="relative flex-1">
-                    <input aria-label="Search books" type="search" name="q" value="{{ old('q', request('q')) }}" class="w-full rounded-md border border-gray-200 px-4 py-3 shadow-md bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Search by title, author or description">
-                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
+                    <input aria-label="Search books" type="search" name="q" value="{{ old('q', request('q')) }}" class="w-full rounded-md border border-[#9aa6c7]/30 px-4 py-3 bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]" placeholder="Search by title, author or description">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[#9aa6c7]">🔍</span>
                 </div>
-                <button class="px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md font-semibold shadow hover:opacity-95 transition" type="submit">Search</button>
+                <button class="px-4 py-3 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-semibold shadow hover:opacity-95 transition" type="submit">Search</button>
                 @if(request('q'))
-                    <a href="{{ route('books.index') }}" class="px-4 py-3 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition">Clear</a>
+                    <a href="{{ route('books.index') }}" class="px-4 py-3 rounded-md bg-white/5 text-[#9aa6c7] border border-[#9aa6c7]/30 hover:bg-white/10 transition">Clear</a>
                 @endif
             </div>
         </form>
@@ -90,13 +96,22 @@
             <div class="alert alert-info">No books found{{ request('q') ? " for \"".e(request('q'))."\"" : '' }}.</div>
         @endif
 
+        <!-- Add Book Button (Librarians Only) -->
+        @if(auth()->user()->user_type === 'librarian')
+        <div class="mb-6">
+            <button onclick="openAddBookModal()" class="px-6 py-3 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-semibold hover:opacity-95 transition shadow-lg">
+                ➕ Add New Book
+            </button>
+        </div>
+        @endif
+
         <!-- Section Switcher Buttons -->
         <div class="mb-6">
             <div class="inline-flex items-center gap-2 bg-transparent p-2 rounded-md">
-                <button id="all-btn" aria-pressed="true" class="px-4 py-2 rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-sm hover:opacity-95 transition section-btn">All Books</button>
-                <button id="trending-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition section-btn">Trending Now</button>
-                <button id="recommended-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition section-btn">Recommended</button>
-                <button id="browse-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 transition section-btn">Browse by Genre</button>
+                <button id="all-btn" aria-pressed="true" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-white font-semibold shadow-sm hover:opacity-95 transition section-btn">All Books</button>
+                <button id="trending-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#00d4ff]/20 to-[#a855f7]/20 text-white border border-[#00d4ff]/50 hover:from-[#00d4ff]/30 hover:to-[#a855f7]/30 transition section-btn">Trending Now</button>
+                <button id="recommended-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#00d4ff]/20 to-[#a855f7]/20 text-white border border-[#00d4ff]/50 hover:from-[#00d4ff]/30 hover:to-[#a855f7]/30 transition section-btn">Recommended</button>
+                <button id="browse-btn" aria-pressed="false" class="px-4 py-2 rounded-md bg-gradient-to-r from-[#00d4ff]/20 to-[#a855f7]/20 text-white border border-[#00d4ff]/50 hover:from-[#00d4ff]/30 hover:to-[#a855f7]/30 transition section-btn">Browse by Genre</button>
             </div>
         </div>
 
@@ -413,4 +428,128 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Add Book Modal -->
+@if(auth()->user()->user_type === 'librarian')
+<div id="addBookModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+    <div class="bg-[#050714] border border-[#9aa6c7]/20 rounded-lg shadow-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-white">Add New Book</h2>
+            <button onclick="closeAddBookModal()" class="text-[#9aa6c7] hover:text-white text-2xl">×</button>
+        </div>
+
+        <form method="POST" action="{{ route('books.store') }}" enctype="multipart/form-data">
+            @csrf
+            
+            <div class="space-y-4">
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Title *</label>
+                    <input type="text" name="title" value="{{ old('title') }}"
+                           class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                           required>
+                </div>
+
+                <!-- Author & ISBN -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Author *</label>
+                        <input type="text" name="author" value="{{ old('author') }}"
+                               class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                               required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-[#e6eef8] mb-2">ISBN *</label>
+                        <input type="text" name="isbn" value="{{ old('isbn') }}"
+                               class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                               required>
+                    </div>
+                </div>
+
+                <!-- Publisher & Published Date -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Publisher *</label>
+                        <input type="text" name="publisher" value="{{ old('publisher') }}"
+                               class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                               required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Published Date *</label>
+                        <input type="date" name="published_date" value="{{ old('published_date') }}"
+                               class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                               required>
+                    </div>
+                </div>
+
+                <!-- Pages -->
+                <div>
+                    <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Pages *</label>
+                    <input type="number" name="pages" value="{{ old('pages') }}" min="1"
+                           class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                           required>
+                </div>
+
+                <!-- Cover Image -->
+                <div>
+                    <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Cover Image</label>
+                    <input type="file" name="cover_image" accept="image/*"
+                           class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]">
+                    <p class="text-xs text-[#9aa6c7] mt-1">Accepted formats: JPEG, PNG, JPG, GIF. Max size: 2MB</p>
+                </div>
+
+                <!-- Genres -->
+                <div>
+                    <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Genres</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach($genres as $genre)
+                            <label class="flex items-center">
+                                <input type="checkbox" name="genre_ids[]" value="{{ $genre->id }}"
+                                       {{ in_array($genre->id, old('genre_ids', [])) ? 'checked' : '' }}
+                                       class="mr-2">
+                                <span class="text-sm text-[#9aa6c7]">{{ $genre->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Description *</label>
+                    <textarea name="description" rows="5"
+                              class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                              required>{{ old('description') }}</textarea>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3 mt-6">
+                <button type="button" onclick="closeAddBookModal()" class="flex-1 px-4 py-3 rounded-lg bg-white/5 text-[#9aa6c7] border border-[#9aa6c7]/30 hover:bg-white/10 transition">
+                    Cancel
+                </button>
+                <button type="submit" class="flex-1 px-4 py-3 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-lg font-semibold hover:opacity-95 transition">
+                    Add Book
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAddBookModal() {
+    document.getElementById('addBookModal').classList.remove('hidden');
+}
+
+function closeAddBookModal() {
+    document.getElementById('addBookModal').classList.add('hidden');
+}
+
+document.getElementById('addBookModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'addBookModal') {
+        closeAddBookModal();
+    }
+});
+</script>
+@endif
+
 @endsection

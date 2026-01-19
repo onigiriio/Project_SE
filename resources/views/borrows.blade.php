@@ -12,7 +12,7 @@
 <!-- Sidebar Panel (toggleable) -->
 <aside class="sidebar-panel">
     <div class="flex items-center gap-3 mb-4">
-        <div class="w-12 h-12 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">LH</div>
+        <img src="/images/libraryHub-icon.svg" alt="LibraryHub" class="w-12 h-12">
         <div>
             <div class="font-semibold">LibraryHub</div>
             <div class="text-xs text-[#9aa6c7]">Menu</div>
@@ -47,13 +47,95 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <main class="space-y-6">
+        <!-- Header -->
         <div class="glass-panel p-6 rounded-lg">
-            <h1 class="text-3xl font-bold text-white mb-2">My Borrows</h1>
-            <p class="text-sm text-[#9aa6c7]">A history of your borrowed books.</p>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white mb-2">My Borrows 📚</h1>
+                    <p class="text-sm text-[#9aa6c7]">Track your borrowed books and borrowing history.</p>
+                </div>
+                <div class="text-5xl">📖</div>
+            </div>
         </div>
 
-        <div class="glass-panel rounded-lg p-8">
-            <h2 class="text-2xl font-bold text-white mb-6">Borrow History</h2>
+        <!-- Statistics Cards -->
+        @php
+            $activeBorrows = auth()->user()->borrows()->whereNull('returned_at')->count();
+            $returnedBorrows = auth()->user()->borrows()->whereNotNull('returned_at')->count();
+            $totalBorrows = auth()->user()->borrows()->count();
+            $avgBorrowDays = auth()->user()->borrows()
+                ->whereNotNull('returned_at')
+                ->selectRaw('AVG(DATEDIFF(returned_at, created_at)) as avg_days')
+                ->first()
+                ->avg_days ?? 0;
+        @endphp
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#00d4ff]">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Total Borrowed</p>
+                        <p class="text-3xl font-bold text-white mt-2">{{ $totalBorrows }}</p>
+                        <p class="text-xs text-[#9aa6c7] mt-1">All time</p>
+                    </div>
+                    <div class="text-4xl">📚</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#a855f7]">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Active Borrows</p>
+                        <p class="text-3xl font-bold text-white mt-2">{{ $activeBorrows }}</p>
+                        <p class="text-xs text-[#9aa6c7] mt-1">Currently reading</p>
+                    </div>
+                    <div class="text-4xl">🎯</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#00d4ff]">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Returned Books</p>
+                        <p class="text-3xl font-bold text-white mt-2">{{ $returnedBorrows }}</p>
+                        <p class="text-xs text-[#9aa6c7] mt-1">Completed</p>
+                    </div>
+                    <div class="text-4xl">✅</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg border-l-4 border-[#a855f7]">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Avg Read Time</p>
+                        <p class="text-3xl font-bold text-white mt-2">{{ round($avgBorrowDays) }}</p>
+                        <p class="text-xs text-[#9aa6c7] mt-1">days</p>
+                    </div>
+                    <div class="text-4xl">⏱️</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Borrows Section -->
+        @if($activeBorrows > 0)
+        <div class="glass-panel p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-white mb-4">Currently Reading 🎯</h2>
+            @php $activeBorrowsList = auth()->user()->borrows()->whereNull('returned_at')->with('book')->latest()->get(); @endphp
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($activeBorrowsList as $borrow)
+                <div class="bg-white/5 p-4 rounded-lg border-l-4 border-[#00d4ff]">
+                    <p class="text-white font-semibold">{{ $borrow->book->title }}</p>
+                    <p class="text-[#9aa6c7] text-sm mt-1">by {{ $borrow->book->author }}</p>
+                    <p class="text-xs text-[#9aa6c7] mt-2">Borrowed {{ $borrow->created_at->diffForHumans() }}</p>
+                    <a href="{{ route('books.show', $borrow->book) }}" class="mt-3 inline-block text-[#00d4ff] hover:text-[#a855f7] text-sm font-semibold">View Book →</a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <!-- Borrow History Table -->
+        <div class="glass-panel rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4">📖 Complete Borrow History</h2>
 
             @if($borrowHistory->count() > 0)
                 <div class="overflow-x-auto">
@@ -62,9 +144,10 @@
                             <tr class="border-b border-[#9aa6c7]/10">
                                 <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Book Title</th>
                                 <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Author</th>
-                                <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Borrowed Date</th>
-                                <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Return Date</th>
+                                <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Borrowed</th>
+                                <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Returned</th>
                                 <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Status</th>
+                                <th class="px-4 py-3 font-semibold text-[#9aa6c7]">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,7 +162,7 @@
                                         @if($borrow->returned_at)
                                             {{ $borrow->returned_at->format('M d, Y') }}
                                         @else
-                                            <span class="text-[#a855f7]">Still borrowed</span>
+                                            <span class="text-[#a855f7] font-semibold">—</span>
                                         @endif
                                     </td>
                                     <td class="px-4 py-3">
@@ -88,6 +171,9 @@
                                         @else
                                             <span class="inline-block px-3 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs font-semibold">Active</span>
                                         @endif
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <a href="{{ route('books.show', $borrow->book) }}" class="text-[#00d4ff] hover:text-[#a855f7] text-xs font-semibold">View</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -100,9 +186,10 @@
                 </div>
             @else
                 <div class="text-center py-12">
-                    <div class="text-4xl mb-4">📚</div>
-                    <p class="text-[#9aa6c7]">You haven't borrowed any books yet.</p>
-                    <a href="{{ route('books.catalogue') }}" class="mt-4 inline-block px-6 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold hover:opacity-90 transition">Browse Books Now</a>
+                    <div class="text-5xl mb-4">📚</div>
+                    <p class="text-lg text-[#9aa6c7] mb-2">No borrow history yet</p>
+                    <p class="text-sm text-[#9aa6c7] mb-4">Start exploring our collection to begin borrowing books.</p>
+                    <a href="{{ route('books.catalogue') }}" class="inline-block px-6 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold hover:opacity-90 transition">Browse Books Now</a>
                 </div>
             @endif
         </div>

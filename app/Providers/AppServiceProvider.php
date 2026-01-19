@@ -23,5 +23,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('manage-books', function ($user) {
             return $user->user_type === 'librarian';
         });
+
+        Gate::define('manage-users', function ($user) {
+            return $user->user_type === 'librarian';
+        });
     }
 }

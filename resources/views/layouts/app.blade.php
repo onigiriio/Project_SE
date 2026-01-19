@@ -134,9 +134,7 @@
                         <span></span>
                         <span></span>
                     </button>
-                    <div class="w-10 h-10 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">
-                        LH
-                    </div>
+                    <img src="/images/libraryHub-icon.svg" alt="LibraryHub" class="w-10 h-10">
                     <div>
                         <div class="font-bold text-lg">LibraryHub</div>
                         <div class="text-xs text-[#9aa6c7]">Book Catalogue</div>

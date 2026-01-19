@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Book 1 (top) -->
+  <path d="M 12 8 L 52 8 Q 56 8 56 12 L 56 32 Q 56 36 52 36 L 12 36 Q 8 36 8 32 L 8 12 Q 8 8 12 8 Z" fill="#FFB84D" stroke="#FF6B35" stroke-width="2" stroke-linejoin="round"/>
+  
+  <!-- Book 1 lines -->
+  <line x1="16" y1="14" x2="48" y2="14" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="16" y1="20" x2="36" y2="20" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="40" cy="17" r="1.5" fill="#333"/>
+  
+  <!-- Book 2 (bottom) -->
+  <path d="M 10 28 L 54 28 Q 58 28 58 32 L 58 52 Q 58 56 54 56 L 10 56 Q 6 56 6 52 L 6 32 Q 6 28 10 28 Z" fill="#FFB84D" stroke="#0084FF" stroke-width="2.5" stroke-linejoin="round"/>
+  
+  <!-- Book 2 lines -->
+  <line x1="14" y1="34" x2="50" y2="34" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="14" y1="40" x2="42" y2="40" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="46" cy="37" r="1.5" fill="#333"/>
+  
+  <!-- Bookmark ribbon -->
+  <rect x="38" y="18" width="6" height="32" fill="#FF6B35" rx="1"/>
+  <circle cx="41" cy="22" r="2.5" fill="white"/>
+  
+  <!-- Bookmark circle/badge -->
+  <circle cx="41" cy="52" r="5" fill="white" stroke="#FF6B35" stroke-width="1.5"/>
+  <circle cx="41" cy="52" r="3" fill="#FF6B35"/>
+</svg>
