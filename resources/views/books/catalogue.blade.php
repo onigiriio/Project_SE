@@ -1,6 +1,69 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .sidebar-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+
+    .nav-link {
+        color: #9aa6c7;
+        text-decoration: none;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        display: block;
+    }
+
+    .nav-link:hover {
+        background: linear-gradient(90deg, rgba(0, 212, 255, 0.04), rgba(168, 85, 247, 0.03));
+        color: #e6eef8;
+        border: 1px solid rgba(0, 212, 255, 0.06);
+    }
+</style>
+
+<!-- Sidebar Panel (Hidden by default, toggleable) -->
+<aside class="sidebar-panel" id="sidebar">
+    <button class="block absolute top-4 right-4 text-[#9aa6c7] hover:text-[#e6eef8] text-2xl" onclick="closeSidebar()">×</button>
+    
+    <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">LH</div>
+        <div>
+            <div class="font-semibold">LibraryHub</div>
+            <div class="text-xs text-[#9aa6c7]">Menu</div>
+        </div>
+    </div>
+
+    <nav class="flex flex-col gap-2 mb-4">
+        <a href="{{ route('dashboard') }}" class="nav-link">Overview</a>
+        <a href="{{ route('profile') }}" class="nav-link">My Profile</a>
+        <a href="{{ route('books.catalogue') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Book Catalogue</a>
+        <a href="#" class="nav-link">My Borrows</a>
+    </nav>
+
+    <div class="mt-4 border-t border-[#9aa6c7]/10 pt-4">
+        <div class="text-xs text-[#9aa6c7]">Logged in as</div>
+        <div class="mt-3 flex items-center gap-3 bg-gradient-to-b from-white/2 to-transparent border border-white/5 p-3 rounded-md">
+            <div class="w-10 h-10 rounded-md bg-gradient-to-br from-[#00d4ff] to-[#a855f7] flex items-center justify-center font-bold text-[#041029]">
+                {{ strtoupper(substr(optional(auth()->user())->name ?? 'U',0,1)) }}
+            </div>
+            <div>
+                <div class="font-semibold">{{ optional(auth()->user())->username ?? optional(auth()->user())->email }}</div>
+                <div class="text-xs text-[#9aa6c7]">{{ ucfirst(optional(auth()->user())->user_type ?? 'user') }}</div>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('logout') }}" class="mt-3">
+            @csrf
+            <button type="submit" class="w-full text-left text-red-400 hover:text-red-300 font-semibold text-sm transition py-2">Sign Out</button>
+        </form>
+    </div>
+</aside>
+
 <div class="min-h-screen py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
@@ -13,7 +76,7 @@
         <form method="GET" action="{{ route('books.index') }}" class="mb-6">
             <div class="flex gap-3 items-center">
                         <div class="relative flex-1">
-                    <input aria-label="Search books" type="search" name="q" value="{{ old('q', request('q')) }}" class="w-full rounded-md border border-gray-200 px-4 py-3 shadow-md bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Search by title, author or description">
+                    <input aria-label="Search books" type="search" name="q" value="{{ old('q', request('q')) }}" class="w-full rounded-md border border-gray-200 px-4 py-3 shadow-md bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Search by title, author or description">
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
                 </div>
                 <button class="px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md font-semibold shadow hover:opacity-95 transition" type="submit">Search</button>
@@ -90,6 +153,13 @@
                                     </div>
                                     <span class="text-gray-600 text-sm ml-2">({{ $book->rating_count }})</span>
                                 </div>
+                                <div class="text-sm font-bold text-green-400">
+                                    @if(auth()->check() && auth()->user()->membership)
+                                        FREE
+                                    @else
+                                        RM {{ number_format($book->price, 2) }}
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -150,6 +220,13 @@
                                         @endfor
                                     </div>
                                     <span class="text-gray-600 text-sm ml-2">({{ $book->rating_count }})</span>
+                                </div>
+                                <div class="text-sm font-bold text-green-400">
+                                    @if(auth()->check() && auth()->user()->membership)
+                                        FREE
+                                    @else
+                                        RM {{ number_format($book->price, 2) }}
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -249,6 +326,13 @@
                                         @endfor
                                     </div>
                                     <span class="text-gray-600 text-sm ml-2">({{ $book->rating_count }})</span>
+                                </div>
+                                <div class="text-sm font-bold text-green-400">
+                                    @if(auth()->check() && auth()->user()->membership)
+                                        FREE
+                                    @else
+                                        RM {{ number_format($book->price, 2) }}
+                                    @endif
                                 </div>
                             </div>
                         </div>

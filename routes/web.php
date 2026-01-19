@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\MembershipController;
 
 Route::get('/', function () {
     return view('library-welcome');
@@ -19,6 +20,10 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+    
+    // Membership routes
+    Route::post('/membership/upgrade', [MembershipController::class, 'upgrade'])->name('membership.upgrade');
 
     Route::get('/catalogue', [BookController::class, 'catalogue'])->name('books.catalogue');
     Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');

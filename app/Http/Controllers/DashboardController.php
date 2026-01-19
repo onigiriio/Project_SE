@@ -16,4 +16,18 @@ class DashboardController extends Controller
 
         return view('dashboard');
     }
+
+    public function profile()
+    {
+        $user = auth()->user();
+        $borrowHistory = $user->borrows()
+            ->with('book')
+            ->latest()
+            ->paginate(10);
+
+        return view('profile', [
+            'user' => $user,
+            'borrowHistory' => $borrowHistory,
+        ]);
+    }
 }

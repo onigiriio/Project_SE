@@ -12,6 +12,18 @@
 
         <!-- Form Card -->
         <div class="bg-white rounded-lg shadow-lg p-8">
+            <style>
+                input[type="text"],
+                input[type="email"],
+                input[type="password"],
+                input[type="date"],
+                input[type="number"],
+                input[type="file"],
+                textarea,
+                select {
+                    color: #000 !important;
+                }
+            </style>
             <h1 class="text-3xl font-bold text-gray-900 mb-8">Edit Book: {{ $book->title }}</h1>
 
             @if ($errors->any())

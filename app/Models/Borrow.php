@@ -15,12 +15,16 @@ class Borrow extends Model
         'book_id',
         'borrowed_at',
         'returned_at',
+        'pickup_date',
+        'pickup_time',
+        'duration_days',
         'status',
     ];
 
     protected $casts = [
         'borrowed_at' => 'datetime',
         'returned_at' => 'datetime',
+        'pickup_date' => 'date',
     ];
 
     public function user(): BelongsTo

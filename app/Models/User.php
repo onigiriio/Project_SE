@@ -25,6 +25,9 @@ class User extends Authenticatable
         'password',
         'user_type',
         'membership',
+        'membership_date',
+        'membership_duration',
+        'membership_expiry',
     ];
 
     /**
@@ -46,6 +49,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'membership' => 'boolean',
+        'membership_expiry' => 'datetime',
     ];
 
     /**

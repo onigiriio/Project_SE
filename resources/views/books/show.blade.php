@@ -89,6 +89,33 @@
                         </div>
                     </div>
 
+                    <!-- Price Section -->
+                    <div class="mb-8 pb-8 border-b border-gray-200">
+                        @if(auth()->check() && auth()->user()->membership)
+                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-sm font-semibold text-green-700 mb-1">MEMBER EXCLUSIVE</h3>
+                                        <p class="text-3xl font-bold text-green-600">FREE TO BORROW</p>
+                                        <p class="text-sm text-green-600 mt-2">Enjoy unlimited borrowing with your membership!</p>
+                                    </div>
+                                    <div class="text-5xl">✓</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-3">Regular price: RM {{ number_format($book->price, 2) }}</p>
+                        @else
+                            <div class="flex items-baseline gap-4">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-500 mb-2">Price to Purchase</h3>
+                                    <p class="text-4xl font-bold text-gray-900">RM {{ number_format($book->price, 2) }}</p>
+                                </div>
+                                <div class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold">
+                                    or borrow as a member
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
                     <!-- Action Buttons -->
                     <div class="mb-8">
                         @auth
@@ -107,10 +134,7 @@
                                 @if(isset($borrowed) && $borrowed)
                                     <button disabled class="px-4 py-2 bg-gray-400 text-white rounded-md font-semibold">Already Borrowed</button>
                                 @else
-                                    <form action="{{ route('books.borrow', $book) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold">Borrow Book</button>
-                                    </form>
+                                    <button type="button" onclick="openBorrowModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold">Borrow Book</button>
                                 @endif
                             @endif
                         @else
@@ -131,6 +155,11 @@
 
         <!-- Reviews Section -->
         <div class="bg-white rounded-lg shadow-lg p-8">
+            <style>
+                textarea {
+                    color: #000 !important;
+                }
+            </style>
             <h2 class="text-2xl font-bold text-gray-900 mb-8">Reviews</h2>
 
             @auth
@@ -160,17 +189,61 @@
                         <!-- Rating -->
                         <div class="mb-6">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Your Rating</label>
-                            <div class="flex gap-2">
+                            <div class="flex gap-2" id="rating-stars">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <label class="cursor-pointer group">
+                                    <label class="cursor-pointer group star-label" data-rating="{{ $i }}">
                                         <input type="radio" name="rating" value="{{ $i }}" class="hidden peer" {{ old('rating') == $i ? 'checked' : '' }}>
-                                        <span class="text-4xl text-gray-300 group-hover:text-yellow-400 peer-checked:text-yellow-400 transition">★</span>
+                                        <span class="text-4xl text-gray-300 peer-checked:text-yellow-400 transition star-icon">★</span>
                                     </label>
                                 @endfor
                             </div>
                             @error('rating')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                            <script>
+                                document.querySelectorAll('.star-label').forEach(label => {
+                                    label.addEventListener('mouseenter', function() {
+                                        const rating = parseInt(this.dataset.rating);
+                                        highlightStars(rating);
+                                    });
+                                });
+                                
+                                document.getElementById('rating-stars').addEventListener('mouseleave', function() {
+                                    const checked = document.querySelector('input[name="rating"]:checked');
+                                    if (checked) {
+                                        highlightStars(parseInt(checked.value));
+                                    } else {
+                                        document.querySelectorAll('.star-icon').forEach(star => {
+                                            star.classList.remove('text-yellow-400');
+                                            star.classList.add('text-gray-300');
+                                        });
+                                    }
+                                });
+                                
+                                document.querySelectorAll('input[name="rating"]').forEach(input => {
+                                    input.addEventListener('change', function() {
+                                        highlightStars(parseInt(this.value));
+                                    });
+                                });
+                                
+                                function highlightStars(rating) {
+                                    document.querySelectorAll('.star-icon').forEach((star, index) => {
+                                        if (index < rating) {
+                                            star.classList.remove('text-gray-300');
+                                            star.classList.add('text-yellow-400');
+                                        } else {
+                                            star.classList.remove('text-yellow-400');
+                                            star.classList.add('text-gray-300');
+                                        }
+                                    });
+                                }
+                                
+                                // Initialize on page load
+                                const checked = document.querySelector('input[name="rating"]:checked');
+                                if (checked) {
+                                    highlightStars(parseInt(checked.value));
+                                }
+                            </script>
                         </div>
 
                         <!-- Comment -->
@@ -242,4 +315,120 @@
         </div>
     </div>
 </div>
+
+<!-- Borrow Book Modal -->
+<div id="borrowModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Book Pickup Details</h2>
+        
+        <form action="{{ route('books.borrow', $book) }}" method="POST">
+            @csrf
+            
+            <!-- Pickup Date -->
+            <div class="mb-6">
+                <label for="pickup_date" class="block text-sm font-semibold text-gray-700 mb-2">Pickup Date *</label>
+                <input type="date" id="pickup_date" name="pickup_date" 
+                       min="{{ date('Y-m-d') }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                       required>
+            </div>
+
+            <!-- Pickup Time -->
+            <div class="mb-6">
+                <label for="pickup_time" class="block text-sm font-semibold text-gray-700 mb-2">Pickup Time *</label>
+                <input type="time" id="pickup_time" name="pickup_time" 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                       required>
+            </div>
+
+            <!-- Borrow Duration -->
+            <div class="mb-6">
+                <label for="duration_days" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Borrowing Duration <span class="text-gray-500">(days)</span> *
+                </label>
+                <div class="flex items-center gap-4">
+                    <input type="range" id="duration_days" name="duration_days" 
+                           min="1" max="30" value="14"
+                           class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateDurationDisplay(this.value)">
+                    <span class="text-lg font-bold text-blue-600 min-w-[3rem] text-center" id="durationDisplay">14 days</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Maximum: 30 days (1 month)</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p class="text-sm text-gray-700">
+                    <span class="font-semibold">Book:</span> {{ $book->title }}<br>
+                    <span class="font-semibold">Return by:</span> <span id="returnDate">-</span>
+                </p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3">
+                <button type="button" onclick="closeBorrowModal()" 
+                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">
+                    Confirm Pickup
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openBorrowModal() {
+        document.getElementById('borrowModal').classList.remove('hidden');
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('pickup_date').min = today;
+        document.getElementById('pickup_date').value = today;
+        updateReturnDate();
+    }
+
+    function closeBorrowModal() {
+        document.getElementById('borrowModal').classList.add('hidden');
+    }
+
+    function updateDurationDisplay(days) {
+        const display = document.getElementById('durationDisplay');
+        display.textContent = days + ' day' + (days != 1 ? 's' : '');
+        updateReturnDate();
+    }
+
+    function updateReturnDate() {
+        const pickupDateInput = document.getElementById('pickup_date');
+        const durationInput = document.getElementById('duration_days');
+        
+        if (pickupDateInput.value) {
+            const pickupDate = new Date(pickupDateInput.value);
+            const duration = parseInt(durationInput.value);
+            const returnDate = new Date(pickupDate);
+            returnDate.setDate(returnDate.getDate() + duration);
+            
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('returnDate').textContent = returnDate.toLocaleDateString('en-US', options);
+        }
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('borrowModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeBorrowModal();
+        }
+    });
+
+    // Update return date when inputs change
+    document.getElementById('pickup_date')?.addEventListener('change', updateReturnDate);
+    document.getElementById('duration_days')?.addEventListener('input', updateReturnDate);
+
+    // Initialize on page load
+    window.addEventListener('load', function() {
+        updateReturnDate();
+    });
+</script>
+
 @endsection

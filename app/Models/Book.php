@@ -23,6 +23,7 @@ class Book extends Model
         'publisher',
         'published_date',
         'cover_image',
+        'price',
         'rating',
         'rating_count',
         'view_count',

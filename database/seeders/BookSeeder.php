@@ -64,7 +64,10 @@ class BookSeeder extends Seeder
             'description' => 'Historical events and periods',
         ]);
 
-        // Sample books
+        // Sample books with prices ranging from RM2 to RM10
+        $prices = [2.00, 3.50, 4.00, 5.00, 6.50, 7.00, 8.00, 9.00, 10.00, 2.50, 5.50];
+        $priceIndex = 0;
+
         $booksData = [
             [
                 'title' => 'The Great Gatsby',
@@ -74,6 +77,7 @@ class BookSeeder extends Seeder
                 'pages' => 180,
                 'publisher' => 'Scribner',
                 'published_date' => '1925-04-10',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 350,
                 'rating' => 4.5,
                 'rating_count' => 2500,
@@ -87,6 +91,7 @@ class BookSeeder extends Seeder
                 'pages' => 328,
                 'publisher' => 'Signet',
                 'published_date' => '1949-06-08',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 420,
                 'rating' => 4.7,
                 'rating_count' => 3100,
@@ -100,6 +105,7 @@ class BookSeeder extends Seeder
                 'pages' => 366,
                 'publisher' => 'Houghton Mifflin',
                 'published_date' => '1937-09-21',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 480,
                 'rating' => 4.8,
                 'rating_count' => 2800,
@@ -113,6 +119,7 @@ class BookSeeder extends Seeder
                 'pages' => 256,
                 'publisher' => 'William Morrow',
                 'published_date' => '1934-01-01',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 390,
                 'rating' => 4.6,
                 'rating_count' => 2300,
@@ -126,6 +133,7 @@ class BookSeeder extends Seeder
                 'pages' => 432,
                 'publisher' => 'Penguin Classics',
                 'published_date' => '1813-01-28',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 360,
                 'rating' => 4.7,
                 'rating_count' => 3500,
@@ -139,6 +147,7 @@ class BookSeeder extends Seeder
                 'pages' => 688,
                 'publisher' => 'Ace',
                 'published_date' => '1965-06-01',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 410,
                 'rating' => 4.6,
                 'rating_count' => 2700,
@@ -152,6 +161,7 @@ class BookSeeder extends Seeder
                 'pages' => 656,
                 'publisher' => 'Simon & Schuster',
                 'published_date' => '2011-10-24',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 280,
                 'rating' => 4.5,
                 'rating_count' => 1900,
@@ -165,6 +175,7 @@ class BookSeeder extends Seeder
                 'pages' => 320,
                 'publisher' => 'Avery',
                 'published_date' => '2018-10-16',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 520,
                 'rating' => 4.8,
                 'rating_count' => 4200,
@@ -178,6 +189,7 @@ class BookSeeder extends Seeder
                 'pages' => 256,
                 'publisher' => 'Bantam',
                 'published_date' => '1988-04-01',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 340,
                 'rating' => 4.4,
                 'rating_count' => 2100,
@@ -191,6 +203,7 @@ class BookSeeder extends Seeder
                 'pages' => 288,
                 'publisher' => 'Viking',
                 'published_date' => '2020-08-13',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 450,
                 'rating' => 4.6,
                 'rating_count' => 2600,
@@ -204,6 +217,7 @@ class BookSeeder extends Seeder
                 'pages' => 487,
                 'publisher' => 'Anchor',
                 'published_date' => '2003-03-18',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 500,
                 'rating' => 4.5,
                 'rating_count' => 3000,
@@ -217,6 +231,7 @@ class BookSeeder extends Seeder
                 'pages' => 224,
                 'publisher' => 'HarperOne',
                 'published_date' => '1988-06-01',
+                'price' => $prices[$priceIndex++ % count($prices)],
                 'view_count' => 470,
                 'rating' => 4.5,
                 'rating_count' => 3300,

@@ -61,6 +61,65 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        .hamburger {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            background: linear-gradient(135deg, #00d4ff, #a855f7);
+            border: none;
+            border-radius: 6px;
+            padding: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.05);
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 2px;
+            background: #050714;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-panel {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            z-index: 40;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: none;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+        }
+
+        .sidebar-panel.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 30;
+            display: none;
+        }
+
+        .sidebar-overlay.open {
+            display: block;
+        }
     </style>
 </head>
 <body class="app-bg text-white min-h-screen">
@@ -68,8 +127,13 @@
     <nav class="navbar sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-between items-center">
-                <!-- Logo -->
+                <!-- Logo & Menu Icon -->
                 <div class="flex items-center gap-3">
+                    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" title="Toggle Menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                     <div class="w-10 h-10 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">
                         LH
                     </div>
@@ -79,11 +143,8 @@
                     </div>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Desktop Navigation Links -->
                 <div class="flex items-center gap-6">
-                    <a href="{{ route('dashboard') }}" class="nav-link">Dashboard</a>
-                    <a href="{{ route('books.catalogue') }}" class="nav-link">Catalogue</a>
-                    
                     @auth
                         <div class="pl-6 border-l border-[#9aa6c7]">
                             <span class="text-sm text-[#9aa6c7]">{{ auth()->user()->username }}</span>
@@ -102,10 +163,11 @@
         </div>
     </nav>
 
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
     <!-- Main Content -->
-    <main>
-        @yield('content')
-    </main>
+    @yield('content')
 
     <!-- Footer -->
     <footer class="border-t border-[#9aa6c7]/20 mt-12">
@@ -115,6 +177,33 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function toggleSidebar() {
+            const overlay = document.getElementById('sidebarOverlay');
+            const sidebars = document.querySelectorAll('.sidebar-panel');
+            
+            sidebars.forEach(sidebar => {
+                sidebar.classList.toggle('open');
+            });
+            overlay.classList.toggle('open');
+        }
+
+        function closeSidebar() {
+            const overlay = document.getElementById('sidebarOverlay');
+            const sidebars = document.querySelectorAll('.sidebar-panel');
+            
+            sidebars.forEach(sidebar => {
+                sidebar.classList.remove('open');
+            });
+            overlay.classList.remove('open');
+        }
+
+        // Close sidebar when clicking on links
+        document.querySelectorAll('.sidebar-panel a').forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+    </script>
 
     @yield('scripts')
 </body>

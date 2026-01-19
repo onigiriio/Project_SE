@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard — LibraryHub')
+@section('title', 'My Profile — LibraryHub')
 
 @section('content')
 <style>
@@ -41,8 +41,8 @@
     </div>
 
     <nav class="flex flex-col gap-2 mb-4">
-        <a href="{{ route('dashboard') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Overview</a>
-        <a href="{{ route('profile') }}" class="nav-link">My Profile</a>
+        <a href="{{ route('dashboard') }}" class="nav-link">Overview</a>
+        <a href="{{ route('profile') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">My Profile</a>
         <a href="{{ route('books.catalogue') }}" class="nav-link">Book Catalogue</a>
         <a href="#" class="nav-link">My Borrows</a>
     </nav>
@@ -69,67 +69,112 @@
 <!-- Main Content -->
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <main class="space-y-6">
-        @auth
+        <!-- Profile Header -->
+        <div class="glass-panel p-6 rounded-lg">
+            <div class="flex items-start gap-6">
+                <div class="w-24 h-24 rounded-lg bg-gradient-to-br from-[#00d4ff] to-[#a855f7] flex items-center justify-center font-bold text-3xl text-[#050714]">
+                    {{ strtoupper(substr(optional(auth()->user())->name ?? 'U',0,1)) }}
+                </div>
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold text-white mb-2">{{ auth()->user()->name ?? auth()->user()->username }}</h1>
+                    <p class="text-[#9aa6c7] mb-4">{{ auth()->user()->email }}</p>
+                    <a href="#" class="px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-sm hover:opacity-90 transition">
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Membership Status -->
+        <div class="glass-panel p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-white mb-4">Membership Status</h2>
             @if(auth()->user()->membership)
-                <div class="glass-panel p-6 rounded-lg">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold text-[#e6eef8] mb-2">Premium Member ✨</h3>
-                            <p class="text-sm text-[#9aa6c7]">You have unlimited book borrowing privileges</p>
-                        </div>
-                        <div class="text-4xl">👑</div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#e6eef8] font-semibold">Premium Member</p>
+                        <p class="text-sm text-[#9aa6c7]">Unlimited book borrowing privileges</p>
                     </div>
+                    <div class="text-4xl">✨</div>
                 </div>
             @else
-                <div class="glass-panel p-6 rounded-lg">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold text-[#e6eef8] mb-2">Upgrade to Membership</h3>
-                            <p class="text-sm text-[#9aa6c7]">Get unlimited free book borrowing and exclusive benefits</p>
-                        </div>
-                        <button onclick="openUpgradeModal()" class="px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-sm hover:opacity-90 transition">
-                            Upgrade Now
-                        </button>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#e6eef8] font-semibold">Standard Member</p>
+                        <p class="text-sm text-[#9aa6c7]">Limited borrowing (Max 3 books)</p>
                     </div>
+                    <button onclick="openUpgradeModal()" class="px-4 py-2 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-sm hover:opacity-90 transition">
+                        Upgrade
+                    </button>
                 </div>
             @endif
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="glass-panel p-4 rounded-lg">
-                    <h3 class="font-semibold mb-3">Recent Activity</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center bg-white/2 p-3 rounded-md">
-                            <div>📚 User John borrowed "Introduction to AI"</div>
-                            <div class="text-xs text-[#9aa6c7]">2m ago</div>
-                        </div>
-                        <div class="flex justify-between items-center bg-white/2 p-3 rounded-md">
-                            <div>🔁 Catalog sync completed</div>
-                            <div class="text-xs text-[#9aa6c7]">10m ago</div>
-                        </div>
-                        <div class="flex justify-between items-center bg-white/2 p-3 rounded-md">
-                            <div>🛠️ Backup finished</div>
-                            <div class="text-xs text-[#9aa6c7]">1h ago</div>
-                        </div>
+        <!-- Account Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass-panel p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Member Since</p>
+                        <p class="text-2xl font-bold text-white mt-2">{{ auth()->user()->created_at->format('M Y') }}</p>
                     </div>
+                    <div class="text-4xl">📅</div>
                 </div>
+            </div>
 
-                @if(auth()->user()->user_type === 'librarian')
-                    <div class="glass-panel p-4 rounded-lg">
-                        <h3 class="font-semibold mb-3">Quick Actions</h3>
-                        <div class="flex flex-col gap-3">
-                            <a href="#" class="py-2 rounded-md bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#041029] font-bold text-center">Add Resource</a>
-                            <a href="#" class="py-2 rounded-md bg-white/3 text-[#9aa6c7] text-center">Manage Users</a>
-                            <a href="#" class="py-2 rounded-md bg-white/3 text-[#9aa6c7] text-center">View Analytics</a>
-                        </div>
+            <div class="glass-panel p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Account Type</p>
+                        <p class="text-2xl font-bold text-white mt-2">{{ ucfirst(auth()->user()->user_type) }}</p>
+                    </div>
+                    <div class="text-4xl">{{ auth()->user()->user_type === 'librarian' ? '📖' : '👤' }}</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[#9aa6c7] text-sm">Books Borrowed</p>
+                        <p class="text-2xl font-bold text-white mt-2">{{ $borrowHistory->total() }}</p>
+                    </div>
+                    <div class="text-4xl">📚</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="glass-panel p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-white mb-4">Account Information</h2>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center pb-4 border-b border-[#9aa6c7]/10">
+                    <span class="text-[#9aa6c7]">Email Address</span>
+                    <span class="text-white font-semibold">{{ auth()->user()->email }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-4 border-b border-[#9aa6c7]/10">
+                    <span class="text-[#9aa6c7]">Username</span>
+                    <span class="text-white font-semibold">{{ auth()->user()->username }}</span>
+                </div>
+                @if(auth()->user()->membership)
+                    <div class="flex justify-between items-center">
+                        <span class="text-[#9aa6c7]">Membership Expiry</span>
+                        <span class="text-white font-semibold">{{ auth()->user()->membership_expiry ? auth()->user()->membership_expiry->format('M d, Y') : 'N/A' }}</span>
                     </div>
                 @endif
             </div>
+        </div>
 
-            <div class="mt-6 glass-panel p-4 rounded-lg">
-                <h3 class="font-semibold mb-2">System Notes</h3>
-                <p class="text-sm text-[#9aa6c7]">All systems nominal. If you notice any irregularities, go to Settings → Diagnostics.</p>
+        <!-- Quick Actions -->
+        <div class="glass-panel p-6 rounded-lg">
+            <h2 class="text-xl font-bold text-white mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <a href="{{ route('books.catalogue') }}" class="px-4 py-3 bg-gradient-to-r from-[#00d4ff] to-[#a855f7] text-[#050714] rounded-md font-bold text-center hover:opacity-90 transition">
+                    Browse Catalogue
+                </a>
+                <a href="#" class="px-4 py-3 bg-white/5 text-[#9aa6c7] rounded-md font-bold text-center hover:bg-white/10 transition">
+                    My Borrows
+                </a>
             </div>
-        @endauth
+        </div>
     </main>
 </div>
 
