@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Borrow;
 use App\Models\Genre;
 use App\Models\Review;
-use App\Http\Requests\StoreBookRequest;
-use App\Http\Requests\UpdateBookRequest;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class BookController extends Controller
 {
     /**
-     * Display the book catalogue with search functionality.
-     * 
-     * <<include>> 'Search Book'
+     * Display the book catalogue.
      */
     public function catalogue(Request $request): View
     {
@@ -73,69 +68,30 @@ class BookController extends Controller
 
     /**
      * Borrow a book for the authenticated user.
-     * 
-     * <<include>> 'Borrow Book'
      */
     public function borrow(Book $book)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
-        // Check if user is an active member
-        $membershipStatus = Auth::user()->getMembershipStatus();
-        if (!$membershipStatus['active']) {
-            return redirect()->back()
-                ->with('error', 'You must complete your membership registration and fee payment to borrow books.');
-        }
-
-        // Check if user already has this book borrowed
         $existing = $book->borrows()
             ->where('user_id', Auth::id())
             ->whereNull('returned_at')
             ->first();
 
         if ($existing) {
-            return redirect()->back()
-                ->with('info', 'You have already borrowed this book. Please return it before borrowing again.');
+            return redirect()->back()->with('success', 'You have already borrowed this book.');
         }
 
-        Borrow::create([
+        \App\Models\Borrow::create([
             'user_id' => Auth::id(),
             'book_id' => $book->id,
             'borrowed_at' => now(),
             'status' => 'borrowed',
         ]);
 
-        return redirect()->back()
-            ->with('success', 'Book borrowed successfully! You can view it in your dashboard.');
-    }
-
-    /**
-     * Return a borrowed book.
-     * 
-     * <<include>> 'Return Book' (connects to Catalog view)
-     */
-    public function returnBook(Borrow $borrow)
-    {
-        // Ensure user can only return their own books
-        if ($borrow->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        // Check if already returned
-        if ($borrow->returned_at) {
-            return redirect()->back()
-                ->with('info', 'This book has already been returned.');
-        }
-
-        $borrow->update([
-            'returned_at' => now(),
-            'status' => 'returned',
-        ]);
-
-        return redirect()->back()
-            ->with('success', 'Book returned successfully. Thank you!');
+        return redirect()->back()->with('success', 'Book borrowed successfully!');
     }
 
     /**
@@ -229,8 +185,6 @@ class BookController extends Controller
 
     /**
      * Show the form for creating a new book.
-     * 
-     * Librarian only - <<include>> 'Add New Book'
      */
     public function create()
     {
@@ -240,12 +194,21 @@ class BookController extends Controller
 
     /**
      * Store a newly created book.
-     * 
-     * <<include>> 'Update Record ID' - generates proper database record with auto-increment ID
      */
-    public function store(StoreBookRequest $request)
+    public function store(Request $request)
     {
-        $validated = $request->validated();
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'isbn' => 'required|string|max:20|unique:books',
+            'description' => 'required|string',
+            'pages' => 'required|integer|min:1',
+            'publisher' => 'required|string|max:255',
+            'published_date' => 'required|date',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'genre_ids' => 'array',
+            'genre_ids.*' => 'exists:genres,id',
+        ]);
 
         $book = Book::create($validated);
 
@@ -256,18 +219,15 @@ class BookController extends Controller
         }
 
         // Attach genres
-        if ($request->has('genres')) {
-            $book->genres()->attach($validated['genres']);
+        if (isset($validated['genre_ids'])) {
+            $book->genres()->attach($validated['genre_ids']);
         }
 
-        return redirect()->route('books.show', $book)
-            ->with('success', 'Book created successfully! Record ID: ' . $book->id);
+        return redirect()->route('books.show', $book)->with('success', 'Book created successfully!');
     }
 
     /**
      * Show the form for editing a book.
-     * 
-     * Librarian only - <<include>> 'Update Book Record'
      */
     public function edit(Book $book)
     {
@@ -277,12 +237,21 @@ class BookController extends Controller
 
     /**
      * Update the specified book.
-     * 
-     * <<include>> 'Update Record ID' - updates record with ID persistence
      */
-    public function update(UpdateBookRequest $request, Book $book)
+    public function update(Request $request, Book $book)
     {
-        $validated = $request->validated();
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'isbn' => 'required|string|max:20|unique:books,isbn,' . $book->id,
+            'description' => 'required|string',
+            'pages' => 'required|integer|min:1',
+            'publisher' => 'required|string|max:255',
+            'published_date' => 'required|date',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'genre_ids' => 'array',
+            'genre_ids.*' => 'exists:genres,id',
+        ]);
 
         $book->update($validated);
 
@@ -290,37 +259,30 @@ class BookController extends Controller
         if ($request->hasFile('cover_image')) {
             // Delete old image if exists
             if ($book->cover_image) {
-                Storage::disk('public')->delete($book->cover_image);
+                \Storage::disk('public')->delete($book->cover_image);
             }
             $imagePath = $request->file('cover_image')->store('book-covers', 'public');
             $book->update(['cover_image' => $imagePath]);
         }
 
         // Sync genres
-        if ($request->has('genres')) {
-            $book->genres()->sync($validated['genres'] ?? []);
-        }
+        $book->genres()->sync($validated['genre_ids'] ?? []);
 
-        return redirect()->route('books.show', $book)
-            ->with('success', 'Book updated successfully! Record ID: ' . $book->id);
+        return redirect()->route('books.show', $book)->with('success', 'Book updated successfully!');
     }
 
     /**
      * Remove the specified book.
-     * 
-     * Librarian only - <<include>> 'Delete Book Record'
      */
     public function destroy(Book $book)
     {
         // Delete cover image if exists
         if ($book->cover_image) {
-            Storage::disk('public')->delete($book->cover_image);
+            \Storage::disk('public')->delete($book->cover_image);
         }
 
-        $bookId = $book->id;
         $book->delete();
 
-        return redirect()->route('books.index')
-            ->with('success', "Book (ID: {$bookId}) has been deleted successfully.");
+        return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
     }
 }
