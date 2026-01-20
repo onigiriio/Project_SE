@@ -40,8 +40,8 @@
 
     <nav class="flex flex-col gap-2 mb-4">
         @if(auth()->user()->user_type === 'librarian')
-            <a href="{{ route('librarian.dashboard') }}" class="nav-link">Dashboard</a>
-            <a href="{{ route('books.catalogue') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Browse Catalogue</a>
+            <a href="{{ route('librarian.dashboard') }}" class="nav-link">Overview</a>
+            <a href="{{ route('books.catalogue') }}" class="inline-block text-sm text-[#e6eef8] bg-gradient-to-r from-[#002b33]/10 to-[#3a003f]/6 px-3 py-2 rounded-md font-semibold">Manage Books</a>
             <a href="{{ route('librarian.users') }}" class="nav-link">Manage Users</a>
         @else
             <a href="{{ route('dashboard') }}" class="nav-link">Overview</a>
@@ -486,6 +486,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div>
                     <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Pages *</label>
                     <input type="number" name="pages" value="{{ old('pages') }}" min="1"
+                           class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
+                           required>
+                </div>
+
+                <!-- Price -->
+                <div>
+                    <label class="block text-sm font-semibold text-[#e6eef8] mb-2">Price (RM) *</label>
+                    <input type="number" name="price" value="{{ old('price') }}" min="0" step="0.01"
                            class="w-full px-4 py-2 border border-[#9aa6c7]/30 rounded-lg bg-white/5 text-white placeholder-[#9aa6c7] focus:outline-none focus:ring-2 focus:ring-[#00d4ff]"
                            required>
                 </div>

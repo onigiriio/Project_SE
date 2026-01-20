@@ -45,10 +45,10 @@ class BookController extends Controller
         // Increment view count
         $book->incrementViewCount();
 
-        // Get reviews with user information
+        // Get reviews with user information, sorted by helpful count
         $reviews = $book->reviews()
             ->with('user')
-            ->latest()
+            ->orderBy('helpful_count', 'desc')
             ->paginate(5);
 
         $borrowed = false;
@@ -203,6 +203,7 @@ class BookController extends Controller
             'isbn' => 'required|string|max:20|unique:books',
             'description' => 'required|string',
             'pages' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
             'publisher' => 'required|string|max:255',
             'published_date' => 'required|date',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -246,6 +247,7 @@ class BookController extends Controller
             'isbn' => 'required|string|max:20|unique:books,isbn,' . $book->id,
             'description' => 'required|string',
             'pages' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
             'publisher' => 'required|string|max:255',
             'published_date' => 'required|date',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\LibrarianController;
 
@@ -33,6 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/genres/{genre}', [BookController::class, 'byGenre'])->name('books.by-genre');
     Route::post('/books/{book}/reviews', [BookController::class, 'storeReview'])->name('books.store-review');
     Route::post('/books/{book}/borrow', [BookController::class, 'borrow'])->name('books.borrow');
+    Route::post('/reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'delete'])->name('reviews.delete');
 
     if (!Route::has('books.index')) {
         Route::get('/books', [BookController::class, 'index'])->name('books.index');

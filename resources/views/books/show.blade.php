@@ -37,8 +37,8 @@
 
     <nav class="flex flex-col gap-2 mb-4">
         @if(auth()->user()->user_type === 'librarian')
-            <a href="{{ route('librarian.dashboard') }}" class="nav-link">Dashboard</a>
-            <a href="{{ route('books.catalogue') }}" class="nav-link">Browse Catalogue</a>
+            <a href="{{ route('librarian.dashboard') }}" class="nav-link">Overview</a>
+            <a href="{{ route('books.catalogue') }}" class="nav-link">Manage Books</a>
             <a href="{{ route('librarian.users') }}" class="nav-link">Manage Users</a>
         @else
             <a href="{{ route('dashboard') }}" class="nav-link">Overview</a>
@@ -339,13 +339,22 @@
             <!-- Reviews List -->
             <div class="space-y-8">
                 @forelse($reviews as $review)
-                    <div class="pb-8 border-b border-[#9aa6c7]/10 last:border-b-0">
+                    <div class="pb-8 border-b border-[#9aa6c7]/10 last:border-b-0" id="review-{{ $review->id }}">
                         <!-- Reviewer Info -->
                         <div class="flex items-start mb-3">
                             <div class="flex-1">
                                 <h4 class="font-semibold text-white">{{ $review->user->username }}</h4>
                                 <p class="text-sm text-[#9aa6c7]">{{ $review->created_at->diffForHumans() }}</p>
                             </div>
+                            
+                            <!-- Delete Button for Librarians -->
+                            @if(Auth::check() && Auth::user()->user_type === 'librarian')
+                                <button type="button" onclick="deleteReview({{ $review->id }})" class="ml-4 p-2 text-[#9aa6c7] hover:text-red-400 transition" title="Delete review">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            @endif
                             
                             <!-- Rating Stars -->
                             <div class="flex text-yellow-400">
@@ -365,8 +374,8 @@
                         @endif
 
                         <!-- Helpful Button -->
-                        <button class="text-sm text-[#9aa6c7] hover:text-[#00d4ff] transition">
-                            👍 Helpful ({{ $review->helpful_count }})
+                        <button type="button" onclick="markHelpful({{ $review->id }})" class="helpful-btn text-sm text-[#9aa6c7] hover:text-[#00d4ff] transition" data-review-id="{{ $review->id }}">
+                            👍 Helpful (<span class="helpful-count">{{ $review->helpful_count }}</span>)
                         </button>
                     </div>
                 @empty
@@ -497,6 +506,104 @@
     window.addEventListener('load', function() {
         updateReturnDate();
     });
+
+    // Mark review as helpful
+    function markHelpful(reviewId) {
+        const button = document.querySelector(`[data-review-id="${reviewId}"]`);
+        const countSpan = button.querySelector('.helpful-count');
+        
+        // Disable button and show loading state
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        fetch(`/reviews/${reviewId}/helpful`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update the helpful count
+                countSpan.textContent = data.helpful_count;
+                
+                // Change button appearance to indicate it was marked helpful
+                button.classList.remove('text-[#9aa6c7]');
+                button.classList.add('text-[#00d4ff]');
+                
+                // Show success message (optional)
+                if (data.message) {
+                    console.log(data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Re-enable button on error
+            button.disabled = false;
+            button.classList.remove('opacity-50', 'cursor-not-allowed');
+        });
+    }
+
+    // Delete a review (librarian only)
+    function deleteReview(reviewId) {
+        // Ask for confirmation
+        if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
+            return;
+        }
+
+        const reviewElement = document.getElementById(`review-${reviewId}`);
+        
+        fetch(`/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete review');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Remove the review element with fade-out animation
+                reviewElement.style.transition = 'opacity 0.3s ease-out';
+                reviewElement.style.opacity = '0';
+                
+                // Remove element after animation
+                setTimeout(() => {
+                    reviewElement.remove();
+                    
+                    // Show success message
+                    console.log(data.message);
+                    
+                    // If no reviews left, reload the page to show "No reviews" message
+                    const reviewsContainer = document.querySelector('[class*="space-y-8"]');
+                    if (reviewsContainer && reviewsContainer.children.length === 0) {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    }
+                }, 300);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete the review. Please try again.');
+        });
+    }
 </script>
 
 @endsection

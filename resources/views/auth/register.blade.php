@@ -167,6 +167,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
                 <button type="submit" class="btn btn-primary">Create Account</button>
             </form>
