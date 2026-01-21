@@ -1,4 +1,4 @@
-# LibraryHub Enhancement Summary
+# IIUM Library Management System Enhancement Summary
 
 ## Changes Implemented
 

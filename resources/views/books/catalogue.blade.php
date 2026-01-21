@@ -33,7 +33,7 @@
     <div class="flex items-center gap-3 mb-4">
         <div class="w-12 h-12 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">LH</div>
         <div>
-            <div class="font-semibold">LibraryHub</div>
+            <div class="font-semibold">IIUM Library Management System</div>
             <div class="text-xs text-[#9aa6c7]">Menu</div>
         </div>
     </div>

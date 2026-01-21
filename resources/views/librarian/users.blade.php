@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Users — LibraryHub')
+@section('title', 'Manage Users — IIUM Library Management System')
 
 @section('content')
 <style>
@@ -33,9 +33,9 @@
     <button class="block absolute top-4 right-4 text-[#9aa6c7] hover:text-[#e6eef8] text-2xl" onclick="closeSidebar()">×</button>
     
     <div class="flex items-center gap-3 mb-4">
-        <img src="/images/libraryHub-icon.svg" alt="LibraryHub" class="w-12 h-12">
+        <img src="/images/libraryHub-icon.svg" alt="IIUM Library Management System" class="w-12 h-12">
         <div>
-            <div class="font-semibold">LibraryHub</div>
+            <div class="font-semibold">IIUM Library Management System</div>
             <div class="text-xs text-[#9aa6c7]">Librarian</div>
         </div>
     </div>

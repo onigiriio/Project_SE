@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'LibraryHub - Book Catalogue')</title>
+    <title>@yield('title', 'IIUM Library Management System - Book Catalogue')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,600|space-mono:400,700" rel="stylesheet" />
@@ -135,9 +135,9 @@
                         <span></span>
                         <span></span>
                     </button>
-                    <img src="/images/libraryHub-icon.svg" alt="LibraryHub" class="w-10 h-10">
+                    <img src="/images/libraryHub-icon.svg" alt="IIUM Library Management System" class="w-10 h-10">
                     <div>
-                        <div class="font-bold text-lg">LibraryHub</div>
+                        <div class="font-bold text-lg">IIUM Library Management System</div>
                         <div class="text-xs text-[#9aa6c7]">Book Catalogue</div>
                     </div>
                 </div>
@@ -172,7 +172,7 @@
     <footer class="border-t border-[#9aa6c7]/20 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="text-center text-[#9aa6c7] text-sm">
-                <p>&copy; 2026 LibraryHub. All rights reserved.</p>
+                <p>&copy; 2026 IIUM Library Management System. All rights reserved.</p>
             </div>
         </div>
     </footer>

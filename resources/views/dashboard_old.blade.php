@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard — LibraryHub')
+@section('title', 'Dashboard — IIUM Library Management System')
 
 @section('content')
 <style>

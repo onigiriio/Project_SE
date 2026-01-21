@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Borrows — LibraryHub')
+@section('title', 'My Borrows — IIUM Library Management System')
 
 @section('content')
 <style>
@@ -12,9 +12,9 @@
 <!-- Sidebar Panel (toggleable) -->
 <aside class="sidebar-panel">
     <div class="flex items-center gap-3 mb-4">
-        <img src="/images/libraryHub-icon.svg" alt="LibraryHub" class="w-12 h-12">
+        <img src="/images/libraryHub-icon.svg" alt="IIUM Library Management System" class="w-12 h-12">
         <div>
-            <div class="font-semibold">LibraryHub</div>
+            <div class="font-semibold">IIUM Library Management System</div>
             <div class="text-xs text-[#9aa6c7]">Menu</div>
         </div>
     </div>

@@ -56,7 +56,7 @@
             <div class="logo">
                 <div class="mark">LH</div>
                 <div>
-                    <div style="font-weight:800">LibraryHub</div>
+                    <div style="font-weight:800">IIUM Library Management System</div>
                     <div style="font-size:0.85rem;color:var(--muted)">Browse Catalogue</div>
                 </div>
             </div>

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>LibraryHub - The Future of Library Management</title>
+        <title>IIUM Library Management System - The Future of Library Management</title>
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|space-mono:400,700" rel="stylesheet" />
@@ -395,7 +395,7 @@
 
         <!-- Header -->
         <header>
-            <div class="logo">📚 LibraryHub</div>
+            <div class="logo">📚 IIUM Library Management System</div>
             <div class="tagline">The Future of Knowledge Management</div>
         </header>
 
@@ -487,7 +487,7 @@
 
         <!-- Footer -->
         <footer>
-            <p>&copy; 2026 LibraryHub - The Future of Knowledge Management. All rights reserved.</p>
+            <p>&copy; 2026 IIUM Library Management System - The Future of Knowledge Management. All rights reserved.</p>
         </footer>
     </body>
 </html>

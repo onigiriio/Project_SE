@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sign In — LibraryHub</title>
+    <title>Sign In — IIUM Library Management System</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,600|space-mono:400,700" rel="stylesheet" />
     <style>
@@ -74,7 +74,7 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <div class="logo">📚 LibraryHub</div>
+                <div class="logo">📚 IIUM Library Management System</div>
                 <div class="tagline">SIGN IN TO YOUR ACCOUNT</div>
             </div>
 

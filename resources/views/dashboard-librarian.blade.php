@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Librarian Dashboard — LibraryHub')
+@section('title', 'Librarian Dashboard — IIUM Library Management System')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -10,7 +10,7 @@
             <div class="flex items-center gap-3 mb-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-[#00d4ff] to-[#a855f7] rounded-lg flex items-center justify-center font-bold text-[#050714]">LH</div>
                 <div>
-                    <div class="font-semibold">LibraryHub</div>
+                    <div class="font-semibold">IIUM Library Management System</div>
                     <div class="text-xs text-[#9aa6c7]">Librarian Panel</div>
                 </div>
             </div>
